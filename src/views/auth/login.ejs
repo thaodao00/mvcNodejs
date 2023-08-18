@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <%- include('../partials/head') %>
+    <body>
+        <section class="h-100 gradient-form" style="background-color: #eee;">
+            <div class="container h-100">
+                <div class="row justify-content-center h-100 pt-5">
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-7 col-xl-6 col-xxl-5">
+                        <div class="card rounded-3 text-black">
+                            <div class="card-body p-5">
+                                <div class="text-center mb-4">
+                                    <img src="/images/logo_trident.png" style="width: 75%;">
+                                </div>
+                                <form method="post">
+                                    <h3 class="text-center mb-5 pb-2 border-bottom border-primary text-nonbreak">ログイン</h3>
+                                    <div class="form-outline mb-3">
+                                        <label class="form-label text-nonbreak" for="email"><b>ログインID</b></label>
+                                        <input type="text" id="email" name="email" class="form-control"/>
+                                    </div>
+                                    <div class="form-outline mb-4">
+                                        <label class="form-label text-nonbreak" for="password"><b>パスワード</b></label>
+                                        <input type="password" id="password" name="password" class="form-control" minlength="8"/>
+                                    </div>
+                                    <% if (typeof errLogin !== "undefined" && errLogin != '') { %>
+                                        <div id="errLogin" class="alert alert-danger" role="alert">
+                                            <span class="font-weight-bold"><%= errLogin %></span>
+                                        </div>
+                                    <% } %>
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary bg-gradient width-120">ログイン</button>
+                                    </div>
+                                </form>
+                            </div>
+                                
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/bootstrap.bundle.min.js"></script>
+        <script>
+            $("#errLogin").delay(2000).slideUp(500);
+        </script>
+    </body>
+</html>

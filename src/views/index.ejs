@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <%- include('./partials/head') %>
+  <%- include('./partials/scripts') %>
+
+  <body class="sb-nav-fixed">
+    <%- include('./partials/header') %>
+      
+      <div id="layoutSidenav">
+
+        <div id="layoutSidenav_nav">
+          <%- include('./partials/sidebar') %>
+        </div>
+        
+        <div id="layoutSidenav_content">
+
+          <main>
+            <%- include('./' + view_content) %>
+          </main>
+          <%- include('./partials/footer') %>
+          
+        </div>
+      </div>
+  </body>
+
+</html>
