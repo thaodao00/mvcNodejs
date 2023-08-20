@@ -4,9 +4,10 @@ const session = require('express-session');
 let middBasic = (app) => {
     app.use(express.urlencoded({ extended: false }));
     app.use(session({
-        resave: false,
-        saveUninitialized: false,
-        secret :'secret showa denki'
+        secret: 'SecretStringForCookie',
+        resave: true,
+        // cookie: { maxAge: 60000 },
+        saveUninitialized: true
     }))
 }
 

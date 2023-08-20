@@ -9,16 +9,16 @@
                         <div class="card rounded-3 text-black">
                             <div class="card-body p-5">
                                 <div class="text-center mb-4">
-                                    <img src="/images/logo_trident.png" style="width: 75%;">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/8234/8234412.png" style="width: 100px;">
                                 </div>
                                 <form method="post">
-                                    <h3 class="text-center mb-5 pb-2 border-bottom border-primary text-nonbreak">ログイン</h3>
+                                    <h3 class="text-center mb-5 pb-2 border-bottom border-primary text-nonbreak">LOGIN</h3>
                                     <div class="form-outline mb-3">
-                                        <label class="form-label text-nonbreak" for="email"><b>ログインID</b></label>
+                                        <label class="form-label text-nonbreak" for="email"><b>Email address</b></label>
                                         <input type="text" id="email" name="email" class="form-control"/>
                                     </div>
                                     <div class="form-outline mb-4">
-                                        <label class="form-label text-nonbreak" for="password"><b>パスワード</b></label>
+                                        <label class="form-label text-nonbreak" for="password"><b>Password</b></label>
                                         <input type="password" id="password" name="password" class="form-control" minlength="8"/>
                                     </div>
                                     <% if (typeof errLogin !== "undefined" && errLogin != '') { %>
@@ -26,12 +26,16 @@
                                             <span class="font-weight-bold"><%= errLogin %></span>
                                         </div>
                                     <% } %>
-                                    <div class="text-center">
-                                        <button type="submit" class="btn btn-primary bg-gradient width-120">ログイン</button>
+                                    <div class="d-grid ">
+                                        <button type="submit" class="btn btn-primary bg-gradient">Login</button>
                                     </div>
                                 </form>
+                                <div class="text-center mt-4">
+                                   
+                                    <div class="small"> <a href="/register"> Create Account</a></div>
+                                </div>
                             </div>
-                                
+
                         </div>
                     </div>
                 </div>

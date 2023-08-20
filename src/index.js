@@ -10,8 +10,11 @@ const connectDB = require('./config/connectDB');
 const routesApp = require('./router/index');
 const db = require('./models');
 const middBasic = require('./middlewares/index');
+const cookieParser = require('cookie-parser');
 const flash = require('connect-flash')
+const errorHandlers = require('./middlewares/errorHandlers')
 let app = express();
+app.use(cookieParser('SecretStringForCookie'));
 middBasic(app);
 configApp(app);
 viewEngine(app);
@@ -20,6 +23,9 @@ app.use(flash());
 connectDB.testConnection();
 routesApp(app);
 let port = process.env.PORT || 3000;
+
+
+app.use(errorHandlers);
 
 
 
