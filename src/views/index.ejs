@@ -1,27 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+<%- include('./partials/head') %>
 
-  <%- include('./partials/head') %>
-  <%- include('./partials/scripts') %>
 
-  <body class="sb-nav-fixed">
-    <%- include('./partials/header') %>
-      
-      <div id="layoutSidenav">
+    <body class="sb-nav-fixed">
+      <div id="layoutSidenav_content">
 
-        <div id="layoutSidenav_nav">
-          <%- include('./partials/sidebar') %>
-        </div>
-        
-        <div id="layoutSidenav_content">
+        <main>
+          <%- include('./' + view_content) %>
+        </main>
 
-          <main>
-            <%- include('./' + view_content) %>
-          </main>
-          <%- include('./partials/footer') %>
-          
-        </div>
+
       </div>
-  </body>
+      <%- include('./partials/scripts') %>
+    </body>
 
 </html>

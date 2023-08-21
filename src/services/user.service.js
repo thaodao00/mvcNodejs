@@ -17,12 +17,9 @@ let createUser = async (body) => {
     let user = await findUserByEmail(body.email);
     if(user ==null){
         let newUser = {
-            // role: body.role,
            name: body.name,
            email: body.email,
-        //    password: body.password,
            password: bcrypt.hashSync(body.password, 10),
-        //    active: body.active,
         }
         return await models.User.create(newUser);
     }

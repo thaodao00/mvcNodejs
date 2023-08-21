@@ -34,6 +34,7 @@ app.listen(port, async () => {
     
     try {
         await db.User.sync();
+        await db.Note.sync();
         console.log('Database synchronized');
     } catch (error) {
         console.error('Error synchronizing database:', error);

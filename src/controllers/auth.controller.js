@@ -1,6 +1,7 @@
 'use strict';
 const serviceUser = require('./../services/user.service');
 const createError = require('http-errors');
+const jwt = require('jsonwebtoken');
 const brypt = require('bcrypt');
 
 let getLoginAdmin = (req, res) => {
@@ -50,17 +51,18 @@ const registerUser = async (req, res) => {
 };
 
 let loginUser = async (req, res) => {
-    console.log("body", req.body);
+
     const { email, password } = req.body;
     const user = await serviceUser.findUserByEmail(email);
 
     if (user && (await brypt.compare(password, user.password))) {
-    // if (user && (password == user.password)) {
-        req.session.user = {
-            email: user.email,
-            role: user.role,
-            name: user.name
-        }
+        const token = jwt.sign(
+            { userId: user.id, email: user.email },
+            'your-secret-key',
+            { expiresIn: '1h' } // Thời gian hết hạn của token
+        );
+    
+        res.cookie('token', token); 
         if (user.role == 2) {
             res.redirect('/dashboard');
         } else if (user.role == 1) {
@@ -73,9 +75,19 @@ let loginUser = async (req, res) => {
     }
 }
 
+let activateAccount =  async (req, res) => {
+
+}
+let sendActivationEmail = async (req, res) => {
+
+}
+
 module.exports = {
     getLoginAdmin: getLoginAdmin,
     loginUser: loginUser,
     register: register,
-    registerUser: registerUser
+    registerUser: registerUser,
+    activateAccount: activateAccount,
+    sendActivationEmail
+
 }
