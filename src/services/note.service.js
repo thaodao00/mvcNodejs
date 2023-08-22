@@ -26,6 +26,7 @@ let createNote = async (body) => {
         let newNote = {
             name: body.name,
             description: body.description,
+            image:body.image,
             user_id: body.userId,
         }
         return await models.Note.create(newNote);
@@ -39,6 +40,7 @@ let updateNote = async (body, noteId) => {
    let updateNote ={
         name:body.nameNote,
         description:body.descriptionNote,
+        image:body.img,
         updated_at:new Date()
    }
     return await models.Note.update(updateNote,
@@ -49,9 +51,18 @@ let updateNote = async (body, noteId) => {
       }
     );
 };
+let deleteNote = async (noteId) => {
+    return await models.Note.destroy({
+        where: {
+            id: noteId
+        }
+    });
+}
     module.exports = {
         getAllNoteByUser: getAllNoteByUser,
         createNote: createNote,
         updateNote: updateNote,
-        getNoteByName:getNoteByName
+        getNoteByName:getNoteByName,
+        deleteNote:deleteNote
+        
     }

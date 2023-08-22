@@ -2,38 +2,41 @@
 const axios = require('axios');
 const brypt = require('bcrypt');
 const serviceNote = require('./../services/note.service');
+const { uploader, viewImage } = require('./../middlewares/upload');
+// Get all note
 let getAllNotes = async (req, res) => {
     const userId = req.user.userId;
-    console.log("userId", userId);
+    // console.log("userId", userId);
     try {
         const notes = await serviceNote.getAllNoteByUser(userId);
+        for (const note of notes) {
+            const imagePath = await viewImage(note.image);
+            note.image = imagePath;
+        }
         res.render("index", {
             view_content: 'home/home',
             notes: notes,
             flash: req.flash()
         });
-        // console.log("notes", notes);
+
     } catch (error) {
         console.error(error);
         res.status(500).send(error.message);
     }
 }
+//Create note
 let createNote = async (req, res) => {
     const userId = req.user.userId;
-    const { name, description } = req.body;
-    // const note = await serviceNote.getNoteByName(name);
+    const { name, description, img } = req.body;
     try {
-        // if (note) {
-        //     req.flash('error', "Note already exists");
-        //     res.redirect('/home');
-        //     // return
-        // }
         if (name && description) {
             const newNote = {
                 name: name,
                 description: description,
+                image: img,
                 userId: userId
             };
+            // console.log(newNote);
             const note = await serviceNote.createNote(newNote);
             res.redirect('/home');
         }
@@ -44,6 +47,7 @@ let createNote = async (req, res) => {
 
     }
 }
+//Update note
 let updateNote = async (req, res) => {
 
     try {
@@ -59,8 +63,38 @@ let updateNote = async (req, res) => {
     }
 
 }
+//Delete note
+let deleteNote = async (req, res) => {
+    try {
+        let noteId = req.params.id;
+        console.log("_________________", noteId);
+        let deleted = await serviceNote.deleteNote(noteId);
+        if (deleted) {
+            res.redirect('/home');
+        }
+    } catch (e) {
+        console.log(e);
+        return res.status(500).send(e.message);
+    }
+}
+//Upload image
+const uploadImage = async (req, res) => {
+    try {
+        const img = await uploader(req.file, 'notes')
+        return res.status(200).json({
+            key: img,
+            path: await viewImage(img)
+        })
+    } catch (err) {
+        res.status(400).json({
+            status: false,
+            stack: err.stack,
+            message: err.message
+        })
+    }
 
-
+}
+//Get profile
 let getProfile = (req, res) => {
     res.render('home/profile');
 }
@@ -68,6 +102,7 @@ module.exports = {
     getAllNotes: getAllNotes,
     getProfile: getProfile,
     createNote: createNote,
-    updateNote: updateNote
-
+    updateNote: updateNote,
+    uploadImage: uploadImage,
+    deleteNote: deleteNote,
 }

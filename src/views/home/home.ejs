@@ -2,7 +2,7 @@
   <div class="container py-5 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col">
-        <div class="card" id="list1" style="border-radius: .75rem; background-color: #eff1f2;">
+        <div class="mb-5" id="list1" style="border-radius: .75rem; background-color:#b3c4cda1;">
           <div class="card-body py-4 px-4 px-md-5">
             <p class="h1 text-center mt-3 mb-4 pb-3 text-info">
               <i class="fas fa-check-square me-1"></i>
@@ -40,34 +40,39 @@
                   class="fas fa-sort-amount-down-alt ms-2"></i></a>
             </div>
             <div class="tab-content bg-transparent">
-              <div id="note-full-container" class="note-has-grid row">
+              <div id="note-full-container" class="note-has-grid row justify-content-center">
                 <% if (notes.length && Array.isArray(notes)) { %>
                   <% notes.forEach(function(note) { %>
-                    <div class="col-md-4 single-note-item all-category mb-3" style="">
-                      <div class="card card-body">
-                        <span class="side-stick"></span>
-                        <h5 class="note-title text-truncate w-75 mb-0" data-noteheading="Book a Ticket for Movie">
-                          <%= note.name %>
-
-                        </h5>
-                        <p class="note-date font-12 text-muted">
-                          <%= moment(note.created_at) %>
-                        </p>
-                        <div class="note-content">
-                          <p class="note-inner-content text-muted"
-                            data-notecontent="Blandit tempus porttitor aasfs. Integer posuere erat a ante venenatis.">
-                            <%= note.description %>
-                          </p>
+                    <div class="col-md-9 single-note-item all-category mb-3">
+                      <div class=" bg-white rounded-1 p-4 row">
+                        <div class="col-md-4">
+                          <div style="height: 200px" class="mb-3">
+                            <img class="note-image-content image-container" src="<%= note.image %>" width="200px"
+                              height="100%" name="img" style="object-fit:cover  ;" />
+                          </div>
                         </div>
-                        <div class="d-flex align-items-center">
-                          <!-- <button class="mr-1"><i class="fa fa-edit edit-note" data-bs-toggle="modal"
-                            data-bs-target="#updateModal"></i></button> -->
+                        <div class="col-md-8">
+                          <h4 class="note-title text-truncate w-75 mb-3" data-noteheading="Book a Ticket for Movie">
+                            <%= note.name %>
+                          </h4>
+                          <p class="note-date font-12 text-muted">
+                            <%= moment(note.created_at) %>
+                          </p>
+                          <div class="note-content">
+                            <p class="note-inner-content text-muted"
+                              data-notecontent="Blandit tempus porttitor aasfs. Integer posuere erat a ante venenatis.">
+                              <%= note.description %>
+                            </p>
+                          </div>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-end">
+
                           <button class="mr-1 edit-note" data-bs-toggle="modal" data-bs-target="#update-notes-modal"
                             data-noteid="<%= note.id %>"><i class="fa fa-edit"></i></button>
-                          <button class="mr-1"><i class="fa fa-trash remove-note" data-bs-toggle="modal" data-bs-target="#delete-notes-modal"></i></button>
-                          <div class="ml-auto">
+                          <button class="mr-1 delete-note" data-notedeleteid="<%= note.id %>"
+                            data-bs-target="#delete-notes-modal" data-bs-toggle="modal"><i class="fa fa-trash remove-note"></i></button>
 
-                          </div>
                         </div>
                       </div>
                     </div>
@@ -90,6 +95,7 @@
         <div class="modal-header bg-info text-white">
           <h5 class="modal-title text-white">Add Note</h5>
           <button type="button" class="close text-white" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
           </button>
         </div>
         <div class="modal-body">
@@ -112,19 +118,24 @@
                     </div>
                   </div>
                   <div class="col-md-12">
-                    <div class="note-description">
-                      <label>Note Description</label>
-                      <input class="form-control" placeholder="Description" rows="3" type="file"
-                        required></input>
+                    <label>Image</label>
+                    <div class="imgBox">
+                      <label class="imgWrap" for="chooseImg">
+                        <div class="imgElement" style="width: 100%"></div>
+                        <input type="file" id="chooseImg"
+                          onchange="uploadImage('/upload-img', '#exampleModal .modal-dialog', 'img', this)" />
+                        <input type="hidden" name="img" class="imgUrl" />
+                      </label>
                     </div>
                   </div>
+
                 </div>
               </form>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+          <!-- <button class="btn btn-danger" data-bs-dismiss="modal">Cancel</button> -->
           <button type="submit" id="btn-n-add" class="btn btn-info">Add</button>
         </div>
       </div>
@@ -140,7 +151,7 @@
         <div class="modal-header bg-info text-white">
           <h5 class="modal-title text-white">Update Note</h5>
           <button type="button" class="close text-white" data-bs-dismiss="modal" aria-label="Close">
-
+            <span aria-hidden="true">×</span>
           </button>
         </div>
         <div class="modal-body">
@@ -148,7 +159,7 @@
             <div class="notes-content">
               <div>
                 <div class="row ">
-                  <div class="col-md-12 mb-3 single-note-item">
+                  <div class="col-md-12 mb-3 ">
                     <div>
                       <label>Note Title</label>
                       <input type="text" id="note-has-title" class="form-control" required placeholder="Tiêu đề"
@@ -156,12 +167,26 @@
                     </div>
                   </div>
 
-                  <div class="col-md-12 single-note-item">
+                  <div class="col-md-12 ">
                     <div class="note-description">
                       <label>Note Description</label>
                       <textarea id="note-has-description" class="form-control" placeholder="Mô tả" rows="3"
                         name="descriptionNote" required></textarea>
                     </div>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <label>Image</label>
+                  <div class="imgBox">
+                    <label class="imgWrap" for="chooseImg">
+                      <div class="imgElement" style="width: 100%"></div>
+                      <input id="chooseImg" type="file"
+                        onchange="uploadImage('/upload-img', '#update-notes-modal .modal-dialog', 'img', this)" />
+                      <input type="hidden" name="img" class="imgUrl" />
+                      <div class="d-flex justify-content-between">
+                        <img id=note-has-image style="object-fit: cover;" width="200px" height="200px" class="mt-3" />
+                      </div>
+                    </label>
                   </div>
                 </div>
                 <input type="hidden" id="update-note-id" name="noteId">
@@ -170,7 +195,6 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
           <button type="submit" class="btn btn-info">Update</button>
         </div>
       </div>
@@ -179,27 +203,28 @@
 </section>
 <!-- modal delete -->
 <section>
-  <form  class="modal fade" id="delete-notes-modal" tabindex="-1" aria-labelledby="deleteModalLabel"
+  <form method="post" class="modal fade" id="delete-notes-modal" tabindex="-1" aria-labelledby="deleteModalLabel"
     aria-hidden="true" style="display: none;">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content border-0">
         <div class="modal-header bg-info text-white">
           <h5 class="modal-title text-white">Delete Note</h5>
           <button type="button" class="close text-white" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
           </button>
         </div>
         <div class="modal-body">
           <div class="notes-box">
             <div class="notes-content">
               <div>
-               <div>_______________________</div>
-                <input type="hidden" id="delete-note-id" name="noteId">
+                <div>Want to delete a note?</div>
+                <input type="hidden" id="delete-note-id" name="noteDeleteId">
+
               </div>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
           <button type="submit" class="btn btn-info">Delete</button>
         </div>
       </div>
@@ -209,7 +234,13 @@
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const editButtons = document.querySelectorAll('.edit-note');
+    const deleteButtons = document.querySelectorAll('.delete-note');
+
+    const deleteForm = document.querySelector('#delete-notes-modal');
     const updateForm = document.querySelector('#update-notes-modal');
+    const imgBox = document.querySelector('.imgBox');
+
+
     editButtons.forEach(button => {
       button.addEventListener('click', function () {
         const noteId = this.getAttribute('data-noteid');
@@ -217,14 +248,33 @@
         updateForm.setAttribute('action', formAction);
         const noteTitle = this.closest('.single-note-item').querySelector('.note-title').innerText;
         const noteDescription = this.closest('.single-note-item').querySelector('.note-inner-content').innerText;
+        const noteImage = this.closest('.single-note-item').querySelector('.note-image-content').getAttribute('src');
 
         const updateNoteIdField = document.querySelector('#update-note-id');
         const noteTitleField = document.querySelector('#note-has-title');
         const noteDescriptionField = document.querySelector('#note-has-description');
+        const noteImageField = document.querySelector('#note-has-image');
         updateNoteIdField.value = noteId;
         noteTitleField.value = noteTitle;
         noteDescriptionField.value = noteDescription;
+        noteImageField.src = noteImage;
+        // alert(noteId)
+
       });
     });
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', function () {
+        const noteId = this.getAttribute('data-notedeleteid');
+        const formAction = `/delete-note/${noteId}`;
+        deleteForm.setAttribute('action', formAction);
+
+        const deleteNoteIdField = document.querySelector('#delete-note-id');
+        deleteNoteIdField.value = noteId;
+        // alert(noteId)
+      });
+    })
+
+
   });
+
 </script>
