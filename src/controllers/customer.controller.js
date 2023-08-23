@@ -6,7 +6,7 @@ const { uploader, viewImage } = require('./../middlewares/upload');
 // Get all note
 let getAllNotes = async (req, res) => {
     const userId = req.user.userId;
-    // console.log("userId", userId);
+    console.log("userId___________________", req.user);
     try {
         const notes = await serviceNote.getAllNoteByUser(userId);
         for (const note of notes) {

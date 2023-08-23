@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 
 let findUserByEmail = async (email) => {
     return await models.User.findOne({
-        where:{
+        where: {
             email: email
         }
     })
@@ -15,19 +15,44 @@ let findUserByEmail = async (email) => {
 
 let createUser = async (body) => {
     let user = await findUserByEmail(body.email);
-    if(user ==null){
+    if (user == null) {
         let newUser = {
-           name: body.name,
-           email: body.email,
-           password: bcrypt.hashSync(body.password, 10),
+            name: body.name,
+            email: body.email,
+            password: bcrypt.hashSync(body.password, 10),
+            role: body.role
         }
         return await models.User.create(newUser);
     }
-    else{
+    else {
         return false
     }
 }
+
+let getAll = async () => {
+    return await models.User.findAll();
+}
+let updateRole = async (id, role) => {
+    return await models.User.update({ role: role }, {
+        where: {
+            id: id
+        }
+    })
+}
+
+let deleteUser = async (id) => {
+    return await models.User.destroy({
+        where: {
+            id: id
+        }
+    })
+}
+
+
 module.exports = {
     findUserByEmail: findUserByEmail,
-    createUser: createUser
+    createUser: createUser,
+    getAll: getAll,
+    updateRole: updateRole,
+    deleteUser: deleteUser
 }

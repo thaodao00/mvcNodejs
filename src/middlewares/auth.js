@@ -22,7 +22,7 @@ auth.checkAdminRole = (req, res, next) => {
     const token = req.cookies.token;
 
     if (!token) {
-        next(createError(404));
+        res.redirect('/login');
     } else {
         jwt.verify(token, 'your-secret-key', (err, decodedToken) => {
             if (err || decodedToken.role !== 2) {

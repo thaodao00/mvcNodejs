@@ -71,7 +71,8 @@
                           <button class="mr-1 edit-note" data-bs-toggle="modal" data-bs-target="#update-notes-modal"
                             data-noteid="<%= note.id %>"><i class="fa fa-edit"></i></button>
                           <button class="mr-1 delete-note" data-notedeleteid="<%= note.id %>"
-                            data-bs-target="#delete-notes-modal" data-bs-toggle="modal"><i class="fa fa-trash remove-note"></i></button>
+                            data-bs-target="#delete-notes-modal" data-bs-toggle="modal"><i
+                              class="fa fa-trash remove-note"></i></button>
 
                         </div>
                       </div>
@@ -90,6 +91,7 @@
 <section>
   <form method="post" action="/create-note" class="modal fade" id="exampleModal" tabindex="-1"
     aria-labelledby="exampleModalLabel" aria-hidden="true" style="display: none;">
+
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content border-0">
         <div class="modal-header bg-info text-white">
@@ -103,6 +105,12 @@
             <div class="notes-content">
               <form id="addnotesmodalTitle">
                 <div class="row">
+                  <div class="d-flex justify-content-center mb-3">
+                    <div id="boldBtn" class="btn me-2">Bold</div>
+                    <button id="italicBtn" class="me-2">Italic</button>
+                    <button id="normalBtn" class="me-2">Lowercase</button>
+                    <button id="normalBtn" class="me-2">Capitalization</button>
+                  </div>
                   <div class="col-md-12 mb-3">
                     <div class="note-title">
                       <label>Note Title</label>
@@ -113,8 +121,8 @@
                   <div class="col-md-12">
                     <div class="note-description">
                       <label>Note Description</label>
-                      <textarea class="form-control" placeholder="Description" rows="3" name="description"
-                        required></textarea>
+                      <textarea class="form-control editor-container" placeholder="Description" rows="3"
+                        name="description" required></textarea>
                     </div>
                   </div>
                   <div class="col-md-12">
@@ -273,8 +281,19 @@
         // alert(noteId)
       });
     })
-
-
+    var quill = new Quill('.editor-container', {
+      theme: 'snow'
+    });
+    document.getElementById('boldBtn').addEventListener('click', function () {
+      const range = quill.getSelection();
+      alert("HELLO")
+      if (range) {
+        quill.format('bold', true);
+      }
+    });
   });
+
+
+
 
 </script>

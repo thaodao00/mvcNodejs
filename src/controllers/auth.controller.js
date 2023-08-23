@@ -1,4 +1,4 @@
-'use strict';
+    'use strict';
 const serviceUser = require('./../services/user.service');
 const createError = require('http-errors');
 const jwt = require('jsonwebtoken');
@@ -57,7 +57,7 @@ let loginUser = async (req, res) => {
 
     if (user && (await brypt.compare(password, user.password))) {
         const token = jwt.sign(
-            { userId: user.id, email: user.email },
+            { userId: user.id, email: user.email, role: user.role },
             'your-secret-key',
             { expiresIn: '1h' } // Thời gian hết hạn của token
         );
