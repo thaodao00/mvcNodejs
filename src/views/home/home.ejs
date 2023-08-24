@@ -229,8 +229,11 @@
     const updateForm = document.querySelector('#update-notes-modal');
     const imgBox = document.querySelector('.imgBox');
 
+    
     const noteInnerContent = document.querySelector('.note-inner-content')
-
+    const quillUpdate = new Quill('.editor-container-update', {
+          theme: 'snow'
+        });
     editButtons.forEach(button => {
       button.addEventListener('click', function () {
 
@@ -251,12 +254,6 @@
         noteTitleField.value = noteTitle;
         noteImageField.src = noteImage;
 
-     
-
-        const quillUpdate = new Quill('.editor-container-update', {
-          theme: 'snow'
-        });
-       
         const deltaObject = quillUpdate.clipboard.convert(textQuill1);
         quillUpdate.setContents(deltaObject);
         descriptionUploadTextarea.value = JSON.stringify(deltaObject);
