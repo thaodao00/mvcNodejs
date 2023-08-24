@@ -1,6 +1,8 @@
 'use strict';
 const axios = require('axios');
 const brypt = require('bcrypt');
+const QuillDeltaToHtmlConverter = require('quill-delta-to-html').QuillDeltaToHtmlConverter;
+const quillDelta = require('quill-delta');
 const serviceNote = require('./../services/note.service');
 const { uploader, viewImage } = require('./../middlewares/upload');
 // Get all note
@@ -10,6 +12,12 @@ let getAllNotes = async (req, res) => {
     try {
         const notes = await serviceNote.getAllNoteByUser(userId);
         for (const note of notes) {
+            const delta = JSON.parse(note.description); // Giả sử note.description chứa đối tượng Delta
+            const converter = new QuillDeltaToHtmlConverter(delta.ops);
+            const html = converter.convert();
+
+            note.description = html;
+
             const imagePath = await viewImage(note.image);
             note.image = imagePath;
         }
@@ -36,7 +44,7 @@ let createNote = async (req, res) => {
                 image: img,
                 userId: userId
             };
-            // console.log(newNote);
+            console.log("________________", newNote);
             const note = await serviceNote.createNote(newNote);
             res.redirect('/home');
         }
