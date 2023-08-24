@@ -1,227 +1,240 @@
 <div class="container my-5">
-	<div class="table-title">
-		<div class="row justify-content-between">
-			<div class="col-sm-6">
-				<h2>Manage <b>User</b></h2>
-			</div>
-			<div class="col-sm-6">
-				<a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal"><i
-						class="material-icons">&#xE147;</i> <span>Add New User</span></a>
-				<a href="#deleteEmployeeModal" class="btn btn-danger btnDeletes" data-toggle="modal"><i
-						class="material-icons">&#xE15C;</i> <span>Delete</span></a>
+	<div class="pb-2">
+		<div class="d-flex justify-content-end">
+			<div class="btn-group">
+				<button class="ms-2 btn btn-light text-dark dropdown-toggle " type="button" data-bs-toggle="dropdown"
+					aria-expanded="false">
+					Action
+				</button>
+				</button>
+				<ul class="dropdown-menu">
+					<li><a class="dropdown-item" href="/profile">Profile</a></li>
+					<li><a class="dropdown-item" href="/home">My Note</a></li>
+					<li><a class="dropdown-item" href="/logout">Logout</a></li>
+				</ul>
 			</div>
 		</div>
-	</div>
-	<table class="table table-striped table-hover mt-4">
-		<thead>
-			<tr>
-				<th>
-					<span class="custom-checkbox">
-						<input type="checkbox" id="masterCheckbox">
-						<label for="masterCheckbox"></label>
-					</span>
-				</th>
-				<th>Name</th>
-				<th>Email</th>
-				<th>Role</th>
-				<th>Actions</th>
-			</tr>
-		</thead>
-		<tbody>
-			<% if(users.length && Array.isArray(users)){%>
-				<%users.forEach(function(user){%>
-					<tr class="single-note-item">
-						<td>
-							<span class="custom-checkbox">
-								<!-- <input type="checkbox" id="checkbox1" name="options[]" value="1" data-userid="<%=user.id%>"> -->
-								<input type="checkbox" class="user-checkbox" name="options[]"
-									data-userid="<%=user.id%>">
-								<label for="checkbox1"></label>
-							</span>
-						</td>
-						<td>
-							<%=user.name%>
-						</td>
-						<td>
-							<%=user.email%>
-						</td>
-						<td id="role">
-							<%= user.role===2 ? 'Admin' : 'User' %>
-						</td>
-
-						<td>
-							<a href="#editEmployeeModal" class="edit edit-user" data-toggle="modal"
-								data-userid="<%=user.id%>"><button><i class="fa fa-edit"></i></button></a>
-
-						</td>
-					</tr>
-					<% })%>
-
-						<% }else{ %>
-							<p class="text-center">No user available.</p>
-							<% } %>
-
-
-		</tbody>
-	</table>
-
-</div>
-<!-- Add Modal HTML -->
-<div id="addEmployeeModal" class="modal fade">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<form method="post" action="add-user">
-				<div class="modal-header">
-					<h4 class="modal-title">Add Employee</h4>
-					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<div class="table-title">
+			<div class="row">
+				<div class="col-md-6">
+					<h2>Manage <b>User</b></h2>
 				</div>
-				<div class="modal-body">
-					<div class="form-group">
-						<label>Name</label>
-						<input type="text" class="form-control" required name="name">
-					</div>
-					<div class="form-group">
-						<label>Email</label>
-						<input type="email" class="form-control" required name="email">
-					</div>
-					<div class="form-group">
-						<label>Role</label>
-						<!-- <textarea class="form-control" required></textarea> -->
-						<select class="form-control" required name="role">
-							<option value="1">User</option>
-							<option value="2">Admin</option>
-						</select>
-					</div>
-					<div class="form-group">
-						<label>Password</label>
-						<input type="password" class="form-control" required name="password">
-					</div>
+				<div class="col-md-6">
+					<a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal"><i
+							class="material-icons">&#xE147;</i> <span>Add New User</span></a>
+					<a href="#deleteEmployeeModal" class="btn btn-danger btnDeletes" data-toggle="modal"><i
+							class="material-icons">&#xE15C;</i> <span>Delete</span></a>
 				</div>
-				<div class="modal-footer">
-					<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-					<input type="submit" class="btn btn-success" value="Add">
-				</div>
-			</form>
+			</div>
 		</div>
-	</div>
-</div>
+		<table class="table table-striped table-hover mt-4">
+			<thead>
+				<tr>
+					<th>
+						<span class="custom-checkbox">
+							<input type="checkbox" id="masterCheckbox">
+							<label for="masterCheckbox"></label>
+						</span>
+					</th>
+					<th>Name</th>
+					<th>Email</th>
+					<th>Role</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<% if(users.length && Array.isArray(users)){%>
+					<%users.forEach(function(user){%>
+						<tr class="single-note-item">
+							<td>
+								<span class="custom-checkbox">
+									<!-- <input type="checkbox" id="checkbox1" name="options[]" value="1" data-userid="<%=user.id%>"> -->
+									<input type="checkbox" class="user-checkbox" name="options[]"
+										data-userid="<%=user.id%>">
+									<label for="checkbox1"></label>
+								</span>
+							</td>
+							<td>
+								<%=user.name%>
+							</td>
+							<td>
+								<%=user.email%>
+							</td>
+							<td id="role">
+								<%= user.role===2 ? 'Admin' : 'User' %>
+							</td>
 
-<!-- Delete Modal HTML -->
-<section>
-	<div id="deleteEmployeeModal" class="modal fade">
+							<td>
+								<a href="#editEmployeeModal" class="edit edit-user" data-toggle="modal"
+									data-userid="<%=user.id%>"><button><i class="fa fa-edit"></i></button></a>
+
+							</td>
+						</tr>
+						<% })%>
+
+							<% }else{ %>
+								<p class="text-center">No user available.</p>
+								<% } %>
+			</tbody>
+		</table>
+
+	</div>
+	<!-- Add Modal HTML -->
+	<div id="addEmployeeModal" class="modal fade">
 		<div class="modal-dialog">
 			<div class="modal-content">
-				<form method="post" id="modalDelete">
+				<form method="post" action="add-user">
 					<div class="modal-header">
-						<h4 class="modal-title">Delete Employee</h4>
+						<h4 class="modal-title">Add Employee</h4>
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 					</div>
 					<div class="modal-body">
-						<p class="text-center">Are you sure you want to delete these Records?</p>
-						<p class="text-warning text-center"><small>This action cannot be undone.</small></p>
+						<div class="form-group">
+							<label>Name</label>
+							<input type="text" class="form-control" required name="name">
+						</div>
+						<div class="form-group">
+							<label>Email</label>
+							<input type="email" class="form-control" required name="email">
+						</div>
+						<div class="form-group">
+							<label>Role</label>
+							<!-- <textarea class="form-control" required></textarea> -->
+							<select class="form-control" required name="role">
+								<option value="1">User</option>
+								<option value="2">Admin</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Password</label>
+							<input type="password" class="form-control" required name="password">
+						</div>
 					</div>
 					<div class="modal-footer">
 						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-						<input type="submit" class="btn btn-danger confirm-delete-selected" value="Delete">
+						<input type="submit" class="btn btn-success" value="Add">
 					</div>
 				</form>
 			</div>
 		</div>
 	</div>
-</section>
-<!-- Edit Modal HTML -->
-<div id="editEmployeeModal" class="modal fade">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<form method="post" id=modalUpdate>
-				<div class="modal-header">
-					<h4 class="modal-title">Edit Employee</h4>
-					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				</div>
-				<div class="modal-body">
-					<div class="form-group">
-						<label>Role</label>
-						<select class="form-control" required name="role" id="update-user-role">
-							<option value="1">User</option>
-							<option value="2">Admin</option>
-						</select>
-					</div>
 
-					<div class="modal-footer">
-						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-						<input type="submit" class="btn btn-info" value="Save">
+	<!-- Delete Modal HTML -->
+	<section>
+		<div id="deleteEmployeeModal" class="modal fade">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<form method="post" id="modalDelete">
+						<div class="modal-header">
+							<h4 class="modal-title">Delete Employee</h4>
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						</div>
+						<div class="modal-body">
+							<p class="text-center">Are you sure you want to delete these Records?</p>
+							<p class="text-warning text-center"><small>This action cannot be undone.</small></p>
+						</div>
+						<div class="modal-footer">
+							<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+							<input type="submit" class="btn btn-danger confirm-delete-selected" value="Delete">
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!-- Edit Modal HTML -->
+	<div id="editEmployeeModal" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form method="post" id=modalUpdate>
+					<div class="modal-header">
+						<h4 class="modal-title">Edit Employee</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 					</div>
-			</form>
+					<div class="modal-body">
+						<div class="form-group">
+							<label>Role</label>
+							<select class="form-control" required name="role" id="update-user-role">
+								<option value="1">User</option>
+								<option value="2">Admin</option>
+							</select>
+						</div>
+
+						<div class="modal-footer">
+							<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+							<input type="submit" class="btn btn-info" value="Save">
+						</div>
+				</form>
+			</div>
 		</div>
 	</div>
-</div>
-<script>
-	document.addEventListener('DOMContentLoaded', function () {
-		const editButtons = document.querySelectorAll('.edit-user');
-		const editForm = document.querySelector('#modalUpdate');
-		editButtons.forEach(button => {
-			button.addEventListener('click', function () {
-				const userId = this.getAttribute('data-userid');
-				const formAction = `/update-user/${userId}`;
-				editForm.setAttribute('action', formAction);
-				const userRole = this.closest('.single-note-item').querySelector('#role').innerText;
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const editButtons = document.querySelectorAll('.edit-user');
+			const editForm = document.querySelector('#modalUpdate');
+			editButtons.forEach(button => {
+				button.addEventListener('click', function () {
+					const userId = this.getAttribute('data-userid');
+					const formAction = `/update-user/${userId}`;
+					editForm.setAttribute('action', formAction);
+					const userRole = this.closest('.single-note-item').querySelector('#role').innerText;
 
-				const updateUserIdField = document.querySelector('#update-user-role');
-				if (userRole === 'Admin') {
-					updateUserIdField.value = 2;
-				} else {
-					updateUserIdField.value = 1;
-				}
-				// updateUserIdField.value = userRole;
-				// alert(updateUserIdField.value)
+					const updateUserIdField = document.querySelector('#update-user-role');
+					if (userRole === 'Admin') {
+						updateUserIdField.value = 2;
+					} else {
+						updateUserIdField.value = 1;
+					}
+					// updateUserIdField.value = userRole;
+					// alert(updateUserIdField.value)
 
-			})
-		});
+				})
+			});
 
-		const deleteForm = document.querySelector('#modalDelete');
-		const masterCheckbox = document.getElementById('masterCheckbox');
-		const checkboxes = document.querySelectorAll('input[name="options[]"]');
+			const deleteForm = document.querySelector('#modalDelete');
+			const masterCheckbox = document.getElementById('masterCheckbox');
+			const checkboxes = document.querySelectorAll('input[name="options[]"]');
 
-		masterCheckbox.addEventListener('change', function () {
+			masterCheckbox.addEventListener('change', function () {
+				checkboxes.forEach(checkbox => {
+					checkbox.checked = masterCheckbox.checked;
+					if (checkbox.checked) {
+						deleteButton.classList.remove('disabled')
+					} else {
+						deleteButton.classList.add('disabled')
+					}
+				});
+			});
+
 			checkboxes.forEach(checkbox => {
-				checkbox.checked = masterCheckbox.checked;
-				if (checkbox.checked) {
-					deleteButton.classList.remove('disabled')
-				} else {
-					deleteButton.classList.add('disabled')
-				}
+				checkbox.addEventListener('change', function () {
+					const anyCheckboxChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+					if (anyCheckboxChecked) {
+						deleteButton.classList.remove('disabled');
+					} else {
+						deleteButton.classList.add('disabled');
+					}
+				});
 			});
-		});
+			const userIds = [];
+			const deleteButton = document.querySelector('.btnDeletes');
+			const deleteMultipleButton = document.querySelector('.confirm-delete-selected');
+			deleteMultipleButton.addEventListener('click', function (e) {
+				e.preventDefault();
+				checkboxes.forEach(checkbox => {
+					if (checkbox.checked) {
+						userIds.push(checkbox.getAttribute('data-userid'));
+					}
+				});
 
-		checkboxes.forEach(checkbox => {
-			checkbox.addEventListener('change', function () {
-				const anyCheckboxChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
-				if (anyCheckboxChecked) {
-					deleteButton.classList.remove('disabled');
-				} else {
-					deleteButton.classList.add('disabled');
-				}
-			});
-		});
-		const userIds = [];
-		const deleteButton = document.querySelector('.btnDeletes');
-		const deleteMultipleButton = document.querySelector('.confirm-delete-selected');
-		deleteMultipleButton.addEventListener('click', function (e) {
-			e.preventDefault();
-			checkboxes.forEach(checkbox => {
-				if (checkbox.checked) {
-					userIds.push(checkbox.getAttribute('data-userid'));
-				}
+				const formAction = `/delete-user/${userIds.join(',')}`;
+				deleteForm.setAttribute('action', formAction);
+				deleteForm.submit();
 			});
 
-			const formAction = `/delete-user/${userIds.join(',')}`;
-			deleteForm.setAttribute('action', formAction);
-			deleteForm.submit();
-		});
-
-		deleteButton.classList.add('disabled') = true
+			deleteButton.classList.add('disabled') = true
 
 
-	})
+		})
 
-</script>
+	</script>

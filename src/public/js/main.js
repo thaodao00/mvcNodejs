@@ -11,7 +11,14 @@ function uploadImage(route = false, wrap = 'body .modal-dialog', inputName = 'im
     const img = $(event)
     const imgData = img.prop('files')[0]
     const formData = new FormData()
-    formData.append(inputName, imgData)
+    // formData.append(inputName, imgData)
+    if (imgData) {
+      formData.append(inputName, imgData);
+  } else {
+      // Lấy đường dẫn hình ảnh hiện có từ thẻ img
+      const noteImage = this.closest('.single-note-item').querySelector('.note-image-content').getAttribute('src');
+      formData.append(inputName, noteImage);
+  }
     $.ajax({
       url: route,
       type: 'POST',
@@ -25,17 +32,17 @@ function uploadImage(route = false, wrap = 'body .modal-dialog', inputName = 'im
       },
       success: async (response) => {
         loadingStop(wrap)
-        const parent = img.closest('.imgWrap')
+        const parent = img.closest('.imgBox')
         parent.find('#note-has-image').hide()
         parent.find('.imgUrl').val(response.key)
-        parent.find('.imgElement').html(`<img class="img" src="${response.path}" width="100%">`)
+        parent.find('.imgElement').html(`<img class="img" src="${response.path}" width="150px">`)
         parent.closest('.imgBox').find('.imgDel').remove()
         parent.closest('.imgBox').append('<span class="imgDel" onclick="delImg(this)"><i class="fas fa-times"></i></span>')
       },
       error: (error) => {
         loadingStop(wrap)
         Swal.fire({
-          title: '通知',
+          title: 'Error!',
           text: error.message,
           icon: 'error',
           showConfirmButton: false,

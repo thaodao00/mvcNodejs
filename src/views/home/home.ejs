@@ -10,36 +10,29 @@
               <u>My Todo-s</u>
             </p>
             <div class="pb-2">
-              <div class="card">
-                <div class="card-body">
-                  <div class="d-flex flex-row align-items-center">
-                    <input type="text" class="form-control form-control-lg" id="exampleFormControlInput1"
-                      placeholder="Search...">
-                    <div>
-                      <button type="button" class="ms-2 btn btn-info" data-bs-toggle="modal"
-                        data-bs-target="#exampleModal">Add</button>
-                    </div>
-                  </div>
+
+              <div class="d-flex justify-content-end">
+                <div class="btn-group">
+                  <button class="ms-2 btn btn-info text-white dropdown-toggle " type="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    Action
+
+                  </button>
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                    <li><a class="dropdown-item" href="#">
+                        <div type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">New Note</div>
+                      </a></li>
+                    <li><a class="dropdown-item" href="/logout">Logout</a></li>
+
+                  </ul>
                 </div>
               </div>
+
             </div>
             <hr class="my-4">
-            <div class="d-flex justify-content-end align-items-center mb-4 pt-2 pb-3">
-              <p class="small mb-0 me-2 text-muted">Filter</p>
-              <select class="select">
-                <option value="1">All</option>
-                <option value="2">Completed</option>
-                <option value="3">Active</option>
-                <option value="4">Has due date</option>
-              </select>
-              <p class="small mb-0 ms-4 me-2 text-muted">Sort</p>
-              <select class="select">
-                <option value="1">Added date</option>
-                <option value="2">Due date</option>
-              </select>
-              <a href="#!" style="color: #23af89;" data-mdb-toggle="tooltip" title="Ascending"><i
-                  class="fas fa-sort-amount-down-alt ms-2"></i></a>
-            </div>
+
             <div class="tab-content bg-transparent">
               <div id="note-full-container" class="note-has-grid row justify-content-center">
                 <% if (notes.length && Array.isArray(notes)) { %>
@@ -49,7 +42,7 @@
                         <div class="col-md-4">
                           <div style="height: 200px" class="mb-3">
                             <img class="note-image-content image-container" src="<%= note.image %>" width="200px"
-                              height="100%" name="img" style="object-fit:cover  ;" />
+                              height="100%" style="object-fit:cover  ;" />
                           </div>
                         </div>
                         <div class="col-md-8">
@@ -95,7 +88,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content border-0">
         <div class="modal-header bg-info text-white">
-          <h5 class="modal-title text-white">Add Note</h5>
+          <h5 class="modal-title text-white">Create Note</h5>
           <button type="button" class="close text-white" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
@@ -117,7 +110,7 @@
                     <div class="note-description">
                       <label>Note Description</label>
                       <textarea class="editor" name="description" hidden></textarea>
-                      <div id="editor-container" style="height:200px;"></div>
+                      <div id="editor-container" style="height:100px;"></div>
                     </div>
                   </div>
                   <div class="col-md-12">
@@ -139,7 +132,7 @@
         </div>
         <div class="modal-footer">
           <!-- <button class="btn btn-danger" data-bs-dismiss="modal">Cancel</button> -->
-          <button type="submit" id="btn-n-add" class="btn btn-info">Add</button>
+          <button type="submit" id="btn-n-add" class="btn btn-info">Save</button>
         </div>
       </div>
     </div>
@@ -173,10 +166,9 @@
                   <div class="col-md-12 ">
                     <div class="note-description">
                       <label>Note Description</label>
-                      <div id="editor-container-update" style="height: 300px;"></div>
+                      <div class="editor-container-update" style="height: 100px;"></div>
                       <textarea id="note-has-description" class="editor-update" name="descriptionNote" hidden
                         required></textarea>
-
                     </div>
                   </div>
                 </div>
@@ -187,12 +179,14 @@
                       <div class="imgElement" style="width: 100%"></div>
                       <input id="chooseImg" type="file"
                         onchange="uploadImage('/upload-img', '#update-notes-modal .modal-dialog', 'img', this)" />
-                      <input type="hidden" name="img" class="imgUrl" />
-                      <div class="d-flex justify-content-between">
-                        <img id=note-has-image style="object-fit: cover;" width="200px" height="200px" class="mt-3" />
-                      </div>
+                      <input type="hidden" name="img" class="imgUrl" id="img-thumbnail" />
+                     
                     </label>
+                    <div class="d-flex justify-content-between">
+                      <img id=note-has-image style="object-fit: cover;" width="150px" class="mt-3" name="imageCurrent" />
+                    </div>
                   </div>
+                 
                 </div>
                 <input type="hidden" id="update-note-id" name="noteId">
               </div>
@@ -244,28 +238,40 @@
     const deleteForm = document.querySelector('#delete-notes-modal');
     const updateForm = document.querySelector('#update-notes-modal');
     const imgBox = document.querySelector('.imgBox');
+    // const imgThumbnail = document.querySelector('#img-thumbnail');
 
     const noteInnerContent = document.querySelector('.note-inner-content')
-    const textQuill = noteInnerContent.dataset.textquill;
-
+    const quillUpdate = new Quill('.editor-container-update', {
+      theme: 'snow'
+    });
     editButtons.forEach(button => {
       button.addEventListener('click', function () {
+        const noteInnerContent1 = this.closest('.single-note-item').querySelector('.note-inner-content');
         const noteId = this.getAttribute('data-noteid');
-
         const formAction = `/update-note/${noteId}`;
         updateForm.setAttribute('action', formAction);
         const noteTitle = this.closest('.single-note-item').querySelector('.note-title').innerText;
         const noteImage = this.closest('.single-note-item').querySelector('.note-image-content').getAttribute('src');
 
+        const textQuill1 = noteInnerContent1.dataset.textquill;
         const updateNoteIdField = document.querySelector('#update-note-id');
         const noteTitleField = document.querySelector('#note-has-title');
         const noteImageField = document.querySelector('#note-has-image');
-  
+        const descriptionUploadTextarea = document.querySelector('.editor-update');
+
+        // imgThumbnail.value = noteImage;
+
         updateNoteIdField.value = noteId;
         noteTitleField.value = noteTitle;
-        noteImageField.src = noteImage;
-     
-
+        noteImageField.setAttribute('src', noteImage);
+        
+        const deltaObject = quillUpdate.clipboard.convert(textQuill1);
+        quillUpdate.setContents(deltaObject);
+        descriptionUploadTextarea.value = JSON.stringify(deltaObject);
+        quillUpdate.on('text-change', function () {
+          const content = quillUpdate.getContents();
+          descriptionUploadTextarea.value = JSON.stringify(content);
+        });
       });
     });
     deleteButtons.forEach(button => {
@@ -283,29 +289,15 @@
 </script>
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script>
-  var quill = new Quill('#editor-container', {
+  const quill = new Quill('#editor-container', {
     theme: 'snow'
   });
-  var descriptionTextarea = document.querySelector('.editor');
+  const descriptionTextarea = document.querySelector('.editor');
   quill.on('text-change', function () {
-    var content = quill.getContents();
+    const content = quill.getContents();
     descriptionTextarea.value = JSON.stringify(content);
   });
 </script>
 <script>
-  const noteInnerContent1 = document.querySelector('.note-inner-content');
-  const textQuill1 = noteInnerContent1.dataset.textquill;
 
-  var quillUpdate = new Quill('#editor-container-update', {
-    theme: 'snow'
-  });
-  var descriptionUploadTextarea = document.querySelector('.editor-update');
-  var deltaObject = quillUpdate.clipboard.convert(textQuill1);
-  quillUpdate.setContents(deltaObject);
-  descriptionUploadTextarea.value = JSON.stringify(deltaObject); 
-
-  quillUpdate.on('text-change', function () {
-    var content = quillUpdate.getContents();
-    descriptionUploadTextarea.value = JSON.stringify(content);
-  });
 </script>

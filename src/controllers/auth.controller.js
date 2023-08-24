@@ -74,20 +74,18 @@ let loginUser = async (req, res) => {
         // res.json({ message: "Email or password incorrect" });
     }
 }
+let logout = (req, res, next) => {
+    res.clearCookie('token');
+    // Add more cookies as needed
+  
+    return res.redirect('/login');
+  }
 
-let activateAccount =  async (req, res) => {
-
-}
-let sendActivationEmail = async (req, res) => {
-
-}
 
 module.exports = {
     getLoginAdmin: getLoginAdmin,
     loginUser: loginUser,
     register: register,
     registerUser: registerUser,
-    activateAccount: activateAccount,
-    sendActivationEmail
-
+    logout: logout,
 }

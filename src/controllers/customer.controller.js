@@ -57,9 +57,12 @@ let createNote = async (req, res) => {
 }
 //Update note
 let updateNote = async (req, res) => {
-
     try {
         let noteId = req.params.id;
+        if(req.body.img==''){
+            req.body.img=req.body.imageCurrent;
+        }
+        console.log("img_________________", req.body);
         let updated = await serviceNote.updateNote(req.body, noteId);
         if (updated) {
             //   req.flash('', '');
