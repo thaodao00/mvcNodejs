@@ -173,7 +173,7 @@
                   <div class="col-md-12 ">
                     <div class="note-description">
                       <label>Note Description</label>
-                      <div id="editor-container-update" style="height: 300px;"></div>
+                      <div class="editor-container-update" style="height: 300px;"></div>
                       <textarea id="note-has-description" class="editor-update" name="descriptionNote" hidden
                         required></textarea>
 
@@ -246,25 +246,43 @@
     const imgBox = document.querySelector('.imgBox');
 
     const noteInnerContent = document.querySelector('.note-inner-content')
-    const textQuill = noteInnerContent.dataset.textquill;
 
     editButtons.forEach(button => {
       button.addEventListener('click', function () {
-        const noteId = this.getAttribute('data-noteid');
 
+        const noteInnerContent1 = this.closest('.single-note-item').querySelector('.note-inner-content');
+
+        const noteId = this.getAttribute('data-noteid');
         const formAction = `/update-note/${noteId}`;
         updateForm.setAttribute('action', formAction);
         const noteTitle = this.closest('.single-note-item').querySelector('.note-title').innerText;
         const noteImage = this.closest('.single-note-item').querySelector('.note-image-content').getAttribute('src');
 
+        const textQuill1 = noteInnerContent1.dataset.textquill;
         const updateNoteIdField = document.querySelector('#update-note-id');
         const noteTitleField = document.querySelector('#note-has-title');
         const noteImageField = document.querySelector('#note-has-image');
-  
+        const descriptionUploadTextarea = document.querySelector('.editor-update');
+
         updateNoteIdField.value = noteId;
         noteTitleField.value = noteTitle;
         noteImageField.src = noteImage;
+
      
+
+        const quillUpdate = new Quill('.editor-container-update', {
+          theme: 'snow'
+        });
+       
+        const deltaObject = quillUpdate.clipboard.convert(textQuill1);
+        quillUpdate.setContents(deltaObject);
+        descriptionUploadTextarea.value = JSON.stringify(deltaObject);
+        quillUpdate.on('text-change', function () {
+          const content = quillUpdate.getContents();
+          descriptionUploadTextarea.value = JSON.stringify(content);
+        });
+
+       
 
       });
     });
@@ -283,29 +301,15 @@
 </script>
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script>
-  var quill = new Quill('#editor-container', {
+  const quill = new Quill('#editor-container', {
     theme: 'snow'
   });
-  var descriptionTextarea = document.querySelector('.editor');
+  const descriptionTextarea = document.querySelector('.editor');
   quill.on('text-change', function () {
-    var content = quill.getContents();
+    const content = quill.getContents();
     descriptionTextarea.value = JSON.stringify(content);
   });
 </script>
 <script>
-  const noteInnerContent1 = document.querySelector('.note-inner-content');
-  const textQuill1 = noteInnerContent1.dataset.textquill;
 
-  var quillUpdate = new Quill('#editor-container-update', {
-    theme: 'snow'
-  });
-  var descriptionUploadTextarea = document.querySelector('.editor-update');
-  var deltaObject = quillUpdate.clipboard.convert(textQuill1);
-  quillUpdate.setContents(deltaObject);
-  descriptionUploadTextarea.value = JSON.stringify(deltaObject); 
-
-  quillUpdate.on('text-change', function () {
-    var content = quillUpdate.getContents();
-    descriptionUploadTextarea.value = JSON.stringify(content);
-  });
 </script>
