@@ -28,14 +28,14 @@ function uploadImage(route = false, wrap = 'body .modal-dialog', inputName = 'im
         const parent = img.closest('.imgWrap')
         parent.find('#note-has-image').hide()
         parent.find('.imgUrl').val(response.key)
-        parent.find('.imgElement').html(`<img class="img" src="${response.path}" width="100%">`)
+        parent.find('.imgElement').html(`<img class="img" src="${response.path}" width="150px">`)
         parent.closest('.imgBox').find('.imgDel').remove()
         parent.closest('.imgBox').append('<span class="imgDel" onclick="delImg(this)"><i class="fas fa-times"></i></span>')
       },
       error: (error) => {
         loadingStop(wrap)
         Swal.fire({
-          title: '通知',
+          title: 'Error!',
           text: error.message,
           icon: 'error',
           showConfirmButton: false,
