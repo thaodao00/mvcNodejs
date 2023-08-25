@@ -2,6 +2,7 @@
 const models = require('../models');
 const bcrypt = require('bcrypt');
 const schedule = require('node-schedule');
+const jobManager = require('../ultils/noteManager');
 
 let getNoteByName = async (name) => {
     return await models.Note.findOne({
@@ -22,24 +23,6 @@ let getAllNoteByUser = async (userId) => {
         ]
     })
 }
-
-// let createNote = async (body) => {
-//     let note = await getNoteByName(body.name);
-//     if (note == null) {
-//         let newNote = {
-//             name: body.name,
-//             description: body.description,
-//             image: body.image,
-//             user_id: body.userId,
-//         }
-//         return await models.Note.create(newNote);
-//     }
-//     else {
-//         return false
-//     }
-// }
-
-
 
 let updateNote = async (body, noteId) => {
     let updateNote = {
@@ -85,6 +68,8 @@ let createNote = async (body) => {
                     await deleteNote(newNote.id);
                 });
                 newNote.cancelJob = job;
+                jobManager.addJob(job); // Thêm tác vụ vào danh sách quản lý
+                // jobManager.startJobs();
             }
             return newNote;
 
