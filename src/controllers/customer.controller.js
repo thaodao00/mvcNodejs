@@ -2,7 +2,10 @@
 const axios = require('axios');
 const brypt = require('bcrypt');
 const encryption = require('../ultils/encryption');
+const fs = require('fs')
+const util = require('util')
 
+const unlinkFile = util.promisify(fs.unlink)
 const QuillDeltaToHtmlConverter = require('quill-delta-to-html').QuillDeltaToHtmlConverter;
 // const quillDelta = require('quill-delta');
 const serviceNote = require('./../services/note.service');
@@ -14,10 +17,10 @@ let getAllNotes = async (req, res) => {
     try {
         const notes = await serviceNote.getAllNoteByUser(userId);
         for (const note of notes) {
-            const ex = encryption.decryptData(note.description,req.user.secretKey);
+            const ex = encryption.decryptData(note.description, req.user.secretKey);
             const delta = JSON.parse(ex);
-            const converter = new QuillDeltaToHtmlConverter(JSON.parse(delta).ops,{});
-            const html = converter.convert(); 
+            const converter = new QuillDeltaToHtmlConverter(JSON.parse(delta).ops, {});
+            const html = converter.convert();
             note.description = html;
             const imagePath = await viewImage(note.image);
             note.image = imagePath;
@@ -42,7 +45,7 @@ let createNote = async (req, res) => {
             const newNote = {
                 name: name,
                 // description: description,
-                description: encryption.encryptData(description,req.user.secretKey),
+                description: encryption.encryptData(description, req.user.secretKey),
                 image: img,
                 userId: userId,
                 cancel_at: cancel_at
@@ -65,13 +68,18 @@ let updateNote = async (req, res) => {
         if (req.body.img == '') {
             req.body.img = req.body.imageCurrent;
         }
-        const note = req.body;
-        note.descriptionNote = encryption.encryptData(note.descriptionNote,req.user.secretKey);
-        // console.log("img_________________", note.description);
+       console.log('------------',req.body.img);
+// 
+        // const noteOld = await serviceNote.getNoteById(noteId); 
 
+        const note = req.body;
+        note.descriptionNote = encryption.encryptData(note.descriptionNote, req.user.secretKey);
         let updated = await serviceNote.updateNote(note, noteId);
         if (updated) {
-            //   req.flash('', '');
+        //    if (noteOld.image && noteOld.image !== note.img) {
+        //         const imagePath = `src/public/uploads/${noteOld.image}`;
+        //         await unlinkFile(imagePath);
+        //     }  //   req.flash('', '');
             res.redirect('/home');
         }
     } catch (e) {
@@ -85,8 +93,18 @@ let deleteNote = async (req, res) => {
     try {
         let noteId = req.params.id;
         console.log("_________________", noteId);
+        const note = await serviceNote.getNoteById(noteId);
+
         let deleted = await serviceNote.deleteNote(noteId);
         if (deleted) {
+            // Nếu xóa ghi chú thành công, thực hiện xóa tập tin ảnh (nếu có)
+            if (note.image) {
+                const imagePath = `src/public/uploads/${note.image}`;
+                if(imagePath){
+                    await unlinkFile(imagePath);
+
+                }
+            }
             res.redirect('/home');
         }
     } catch (e) {

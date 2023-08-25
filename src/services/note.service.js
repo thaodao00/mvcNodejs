@@ -11,6 +11,13 @@ let getNoteByName = async (name) => {
         }
     })
 }
+let getNoteById = async (id) => {
+    return await models.Note.findOne({
+        where: {
+            'id': id
+        }
+    })
+}
 //lấy tất cả post của user
 
 let getAllNoteByUser = async (userId) => {
@@ -85,6 +92,7 @@ module.exports = {
     createNote: createNote,
     updateNote: updateNote,
     getNoteByName: getNoteByName,
-    deleteNote: deleteNote
+    deleteNote: deleteNote,
+    getNoteById: getNoteById
 
 }
