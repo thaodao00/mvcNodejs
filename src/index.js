@@ -12,7 +12,10 @@ const db = require('./models');
 const middBasic = require('./middlewares/index');
 const cookieParser = require('cookie-parser');
 const flash = require('connect-flash')
+const { DateTime } = require('luxon')
+const noteManager = require('./ultils/noteManager');
 const errorHandlers = require('./middlewares/errorHandlers')
+
 let app = express();
 app.use(cookieParser('SecretStringForCookie'));
 middBasic(app);
@@ -28,6 +31,8 @@ let port = process.env.PORT || 3000;
 app.use(errorHandlers);
 
 
+DateTime.local().setZone('Asia/Ho_Chi_Minh');
+noteManager.startJobs();
 
 app.listen(port, async () => {
     console.log("Servidor corriendo en el puerto " + port);

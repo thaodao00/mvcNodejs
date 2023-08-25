@@ -1,8 +1,10 @@
 'use strict';
 const axios = require('axios');
 const brypt = require('bcrypt');
+const encryption = require('../ultils/encryption');
+
 const QuillDeltaToHtmlConverter = require('quill-delta-to-html').QuillDeltaToHtmlConverter;
-const quillDelta = require('quill-delta');
+// const quillDelta = require('quill-delta');
 const serviceNote = require('./../services/note.service');
 const { uploader, viewImage } = require('./../middlewares/upload');
 // Get all note
@@ -12,12 +14,11 @@ let getAllNotes = async (req, res) => {
     try {
         const notes = await serviceNote.getAllNoteByUser(userId);
         for (const note of notes) {
-            const delta = JSON.parse(note.description); // Giả sử note.description chứa đối tượng Delta
-            const converter = new QuillDeltaToHtmlConverter(delta.ops);
-            const html = converter.convert();
-
+            const ex = encryption.decryptData(note.description,req.user.secretKey);
+            const delta = JSON.parse(ex);
+            const converter = new QuillDeltaToHtmlConverter(JSON.parse(delta).ops,{});
+            const html = converter.convert(); 
             note.description = html;
-
             const imagePath = await viewImage(note.image);
             note.image = imagePath;
         }
@@ -35,14 +36,16 @@ let getAllNotes = async (req, res) => {
 //Create note
 let createNote = async (req, res) => {
     const userId = req.user.userId;
-    const { name, description, img } = req.body;
+    const { name, description, img, cancel_at } = req.body;
     try {
         if (name && description) {
             const newNote = {
                 name: name,
-                description: description,
+                // description: description,
+                description: encryption.encryptData(description,req.user.secretKey),
                 image: img,
-                userId: userId
+                userId: userId,
+                cancel_at: cancel_at
             };
             console.log("________________", newNote);
             const note = await serviceNote.createNote(newNote);
@@ -59,11 +62,14 @@ let createNote = async (req, res) => {
 let updateNote = async (req, res) => {
     try {
         let noteId = req.params.id;
-        if(req.body.img==''){
-            req.body.img=req.body.imageCurrent;
+        if (req.body.img == '') {
+            req.body.img = req.body.imageCurrent;
         }
-        console.log("img_________________", req.body);
-        let updated = await serviceNote.updateNote(req.body, noteId);
+        const note = req.body;
+        note.descriptionNote = encryption.encryptData(note.descriptionNote,req.user.secretKey);
+        // console.log("img_________________", note.description);
+
+        let updated = await serviceNote.updateNote(note, noteId);
         if (updated) {
             //   req.flash('', '');
             res.redirect('/home');

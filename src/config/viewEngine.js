@@ -7,7 +7,7 @@ let configViewEngine = (app) => {
         return moment(date)
             .utcOffset(7)
             // .locale('vi')
-            .format('D MMMM YYYY'); // Điều chỉnh múi giờ và định dạng ngày tháng
+            .format('h:mm A, MMMM D, YYYY'); // Điều chỉnh múi giờ và định dạng ngày tháng
     }
 }
 

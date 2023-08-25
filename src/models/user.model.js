@@ -33,6 +33,11 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
 
         },
+        secretKey: {
+            type: DataTypes.STRING(191),
+            allowNull: true,
+            defaultValue: () => nanoid(31)
+        },
         active: {
             type: DataTypes.BOOLEAN,
             defaultValue: 1

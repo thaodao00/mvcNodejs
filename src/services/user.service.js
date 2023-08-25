@@ -30,7 +30,9 @@ let createUser = async (body) => {
 }
 
 let getAll = async () => {
-    return await models.User.findAll();
+    return await models.User.findAll({
+        order: [['created_at', 'DESC']]
+    });
 }
 let updateRole = async (id, role) => {
     return await models.User.update({ role: role }, {
