@@ -57,7 +57,7 @@ let loginUser = async (req, res) => {
 
     if (user && (await brypt.compare(password, user.password))) {
         const token = jwt.sign(
-            { userId: user.id, email: user.email, role: user.role },
+            { userId: user.id, email: user.email, role: user.role, secretKey: user.secretKey },
             'your-secret-key',
             { expiresIn: '1h' } // Thời gian hết hạn của token
         );

@@ -3,7 +3,7 @@ const models = require('../models');
 const bcrypt = require('bcrypt');
 const schedule = require('node-schedule');
 const jobManager = require('../ultils/noteManager');
-
+const encryption = require('../ultils/encryption');
 let getNoteByName = async (name) => {
     return await models.Note.findOne({
         where: {
@@ -51,6 +51,7 @@ let createNote = async (body) => {
     try {
         let note = {
             name: body.name,
+            // description:encryption.encryptData(body.description,req.user.secretKey),
             description: body.description,
             image: body.image,
             user_id: body.userId,
@@ -58,9 +59,9 @@ let createNote = async (body) => {
         }
 
         if (body.cancel_at !== null) {
-            // note.cancel_at = new Date(new Date().getTime() + body.cancel_at * 60 * 60 * 1000)
+            note.cancel_at = new Date(new Date().getTime() + body.cancel_at * 60 * 60 * 1000)
 
-            note.cancel_at = new Date(new Date().getTime() + body.cancel_at * 1000);
+            // note.cancel_at = new Date(new Date().getTime() + body.cancel_at * 1000);
             const newNote = await models.Note.create(note);
 
             if (newNote.cancel_at !== null && !isNaN(body.cancel_at)) {
@@ -68,13 +69,11 @@ let createNote = async (body) => {
                     await deleteNote(newNote.id);
                 });
                 newNote.cancelJob = job;
-                jobManager.addJob(job); // Thêm tác vụ vào danh sách quản lý
-                // jobManager.startJobs();
+                jobManager.addJob(job);
             }
             return newNote;
 
-            // Lưu job vào newNote để có thể hủy công việc nếu cần
-            // newNote.cancelJob = job;
+           
         }
 
     } catch (error) {
