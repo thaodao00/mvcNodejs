@@ -34,7 +34,10 @@ module.exports = (sequelize, DataTypes) => {
         delete: {
             type: DataTypes.BOOLEAN,
             defaultValue: 0
-        }
+        },
+        cancel_at: {
+            type: DataTypes.DATE,
+          }
     }, {
         sequelize,
         modelName: 'Note',

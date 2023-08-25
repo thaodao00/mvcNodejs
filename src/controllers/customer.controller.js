@@ -35,14 +35,15 @@ let getAllNotes = async (req, res) => {
 //Create note
 let createNote = async (req, res) => {
     const userId = req.user.userId;
-    const { name, description, img } = req.body;
+    const { name, description, img, cancel_at } = req.body;
     try {
         if (name && description) {
             const newNote = {
                 name: name,
                 description: description,
                 image: img,
-                userId: userId
+                userId: userId,
+                cancel_at: cancel_at
             };
             console.log("________________", newNote);
             const note = await serviceNote.createNote(newNote);
@@ -59,8 +60,8 @@ let createNote = async (req, res) => {
 let updateNote = async (req, res) => {
     try {
         let noteId = req.params.id;
-        if(req.body.img==''){
-            req.body.img=req.body.imageCurrent;
+        if (req.body.img == '') {
+            req.body.img = req.body.imageCurrent;
         }
         console.log("img_________________", req.body);
         let updated = await serviceNote.updateNote(req.body, noteId);
