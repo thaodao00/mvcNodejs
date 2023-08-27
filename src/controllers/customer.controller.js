@@ -65,23 +65,27 @@ let createNote = async (req, res) => {
 let updateNote = async (req, res) => {
     try {
         let noteId = req.params.id;
-        if (req.body.img == '') {
-            req.body.img = req.body.imageCurrent;
-        }
-       console.log('------------',req.body.img);
-// 
-        // const noteOld = await serviceNote.getNoteById(noteId); 
+       
+        const noteCurrent = await serviceNote.getNoteById(noteId);
+        console.log('------------image', noteCurrent.image);
 
         const note = req.body;
+        if (!note.img) {
+            note.img = req.body.imageCurrent;
+        }
         note.descriptionNote = encryption.encryptData(note.descriptionNote, req.user.secretKey);
         let updated = await serviceNote.updateNote(note, noteId);
         if (updated) {
-        //    if (noteOld.image && noteOld.image !== note.img) {
-        //         const imagePath = `src/public/uploads/${noteOld.image}`;
-        //         await unlinkFile(imagePath);
-        //     }  //   req.flash('', '');
+            // Nếu có ảnh mới và khác với ảnh cũ, xóa ảnh cũ
+            if (note.img && noteCurrent.image) {
+                const imagePath = `src/public/uploads/${noteCurrent.image}`;
+                    await unlinkFile(imagePath);
+
+            }
+
             res.redirect('/home');
         }
+      
     } catch (e) {
         console.log(e);
         return res.status(500).send(e.message);
@@ -100,7 +104,7 @@ let deleteNote = async (req, res) => {
             // Nếu xóa ghi chú thành công, thực hiện xóa tập tin ảnh (nếu có)
             if (note.image) {
                 const imagePath = `src/public/uploads/${note.image}`;
-                if(imagePath){
+                if (imagePath) {
                     await unlinkFile(imagePath);
 
                 }

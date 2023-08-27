@@ -66,9 +66,8 @@ let createNote = async (body) => {
         }
 
         if (body.cancel_at !== null) {
-            note.cancel_at = new Date(new Date().getTime() + body.cancel_at * 60 * 60 * 1000)
-
-            // note.cancel_at = new Date(new Date().getTime() + body.cancel_at * 1000);
+            // note.cancel_at = new Date(new Date().getTime() + body.cancel_at * 60 * 60 * 1000)
+            note.cancel_at = new Date(new Date().getTime() + body.cancel_at * 1000);
             const newNote = await models.Note.create(note);
 
             if (newNote.cancel_at !== null && !isNaN(body.cancel_at)) {
