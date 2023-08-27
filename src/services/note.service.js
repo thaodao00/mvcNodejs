@@ -11,6 +11,13 @@ let getNoteByName = async (name) => {
         }
     })
 }
+let getNoteById = async (id) => {
+    return await models.Note.findOne({
+        where: {
+            'id': id
+        }
+    })
+}
 //lấy tất cả post của user
 
 let getAllNoteByUser = async (userId) => {
@@ -59,9 +66,8 @@ let createNote = async (body) => {
         }
 
         if (body.cancel_at !== null) {
-            note.cancel_at = new Date(new Date().getTime() + body.cancel_at * 60 * 60 * 1000)
-
-            // note.cancel_at = new Date(new Date().getTime() + body.cancel_at * 1000);
+            // note.cancel_at = new Date(new Date().getTime() + body.cancel_at * 60 * 60 * 1000)
+            note.cancel_at = new Date(new Date().getTime() + body.cancel_at * 1000);
             const newNote = await models.Note.create(note);
 
             if (newNote.cancel_at !== null && !isNaN(body.cancel_at)) {
@@ -85,6 +91,7 @@ module.exports = {
     createNote: createNote,
     updateNote: updateNote,
     getNoteByName: getNoteByName,
-    deleteNote: deleteNote
+    deleteNote: deleteNote,
+    getNoteById: getNoteById
 
 }
