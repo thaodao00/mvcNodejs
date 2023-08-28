@@ -2,8 +2,8 @@ const schedule = require('node-schedule');
 
 const jobs = [];
 
-function addJob(job) {
-    jobs.push(job);
+function addJob(job,id) {
+    jobs.push({job,id});
 }
 
 function removeJob(job) {
@@ -20,5 +20,6 @@ function startJobs() {
 module.exports = {
     addJob:addJob,
     removeJob:removeJob,
-    startJobs:startJobs
+    startJobs:startJobs,
+    jobs:jobs
 };
