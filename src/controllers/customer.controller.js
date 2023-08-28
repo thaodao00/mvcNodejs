@@ -96,13 +96,13 @@ let updateNote = async (req, res) => {
 let deleteNote = async (req, res) => {
     try {
         let noteId = req.params.id;
-        console.log("_________________", noteId);
-        const note = await serviceNote.getNoteById(noteId);
-
+        
         let deleted = await serviceNote.deleteNote(noteId);
-        if (deleted) {
+        const note = await serviceNote.getNoteById(noteId);
+        console.log("_________________note", note);
+        // if (deleted) {
             // Nếu xóa ghi chú thành công, thực hiện xóa tập tin ảnh (nếu có)
-            if (note.image) {
+            if (note && note.image) {
                 const imagePath = `src/public/uploads/${note.image}`;
                 if (imagePath) {
                     await unlinkFile(imagePath);
@@ -110,7 +110,7 @@ let deleteNote = async (req, res) => {
                 }
             }
             res.redirect('/home');
-        }
+        // }
     } catch (e) {
         console.log(e);
         return res.status(500).send(e.message);

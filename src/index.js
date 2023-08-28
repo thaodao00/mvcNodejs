@@ -15,6 +15,7 @@ const flash = require('connect-flash')
 const { DateTime } = require('luxon')
 const noteManager = require('./ultils/noteManager');
 const errorHandlers = require('./middlewares/errorHandlers')
+// const flatpickrSetup = require('./ultils/flatpickr-setup');
 
 let app = express();
 app.use(cookieParser('SecretStringForCookie'));
