@@ -71,6 +71,18 @@ let updateNote = async (body, noteId) => {
             }
 
             console.log(jobManager.jobs, "___________________job");
+            const notificationDate = new Date(cancelDate.getTime() - 60 * 60 * 1000); // Trừ đi 1 tiếng
+                const currentTime = new Date();
+                const timeUntilNotification = notificationDate - currentTime;
+                const io = socketManager.getSocketIOInstance();
+
+                if (timeUntilNotification > 0) {
+                    const notificationJob = schedule.scheduleJob(notificationDate, () => {
+                        io.emit('noteAboutToBeCancelled', `Note ${newNote.name} will be cancelled in 1 hour.`);
+                    });
+
+                    jobManager.addJob(notificationJob, newNote.id, true); // Đánh dấu là công việc thông báo
+                }
             return newNote;
         } else {
             const newNote = await models.Note.update(updateNote, {
@@ -91,17 +103,34 @@ let deleteNote = async (noteId) => {
             id: noteId
         }
     });
-    if (note.image && note.image !== "" && note.image !== undefined) {
-        const imagePath = `src/public/uploads/${note.image}`;
+    if (note?.image && note?.image !== "" && note?.image !== undefined) {
+        const imagePath = `src/public/uploads/${note?.image}`;
         if (imagePath) {
             await unlinkFile(imagePath);
         }
     }
     const io = socketManager.getSocketIOInstance();
+    console.log('io:__________________', io);
+
+    // if (note.cancel_at && note.cancel_at !== "" && note.cancel_at !== undefined) {
+    //     const cancelDate = new Date(note.cancel_at);
+    //     const notificationDate = new Date(cancelDate.getTime() - 60 * 60 * 1000); // Trừ đi 1 tiếng
+
+    //     const currentTime = new Date();
+    //     const timeUntilNotification = notificationDate - currentTime;
+
+    //     if (timeUntilNotification > 0) {
+    //         const job = schedule.scheduleJob(notificationDate, () => {
+    //             io.emit('noteAboutToBeCancelled', `Note ${note.name} will be cancelled in 1 hour.`);
+    //         });
+
+    //         jobManager.addJob(job);
+    //     }
+    //     // else{}
+    // }
     if (io) {
         io.emit('noteDeleted', `Canceled note ${note.name} successfully`);
     }
-
 }
 
 const createNote = async (body) => {
@@ -128,6 +157,18 @@ const createNote = async (body) => {
                     newNote.cancel_at = job;
                     jobManager.addJob(job, newNote.id);
                     // jobManager.jobs.push({ noteId: newNote.id, job });
+                }
+                const notificationDate = new Date(cancelDate.getTime() - 60 * 60 * 1000); // Trừ đi 1 tiếng
+                const currentTime = new Date();
+                const timeUntilNotification = notificationDate - currentTime;
+                const io = socketManager.getSocketIOInstance();
+
+                if (timeUntilNotification > 0) {
+                    const notificationJob = schedule.scheduleJob(notificationDate, () => {
+                        io.emit('noteAboutToBeCancelled', `Note ${newNote.name} will be cancelled in 1 hour.`);
+                    });
+
+                    jobManager.addJob(notificationJob);
                 }
                 console.log(jobManager.jobs, "___________________");
                 return newNote;
