@@ -1,0 +1,106 @@
+<section class="vh-100">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col">
+                <div class="mb-5" id="list1" style="border-radius: .75rem; background-color:#b3c4cda1;">
+                    <div class="card-body py-4 px-4 px-md-5">
+                        <p class="h1 text-center mt-3 mb-4 pb-3 text-info">
+                            <i class="fas fa-check-square me-1"></i>
+                            <u>Notes Public</u>
+                        </p>
+                        <div class="pb-2">
+                            <div class="d-flex justify-content-end">
+                                <div class="btn-group">
+                                    <button class="ms-2 btn btn-info text-white dropdown-toggle " type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        Action
+
+                                    </button>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="/notes">
+                                                Shared notes list
+                                            </a></li>
+                                        <li><a class="dropdown-item" href="/home">
+                                            </a></li>
+                                        <li><a class="dropdown-item" href="/logout">Logout</a></li>
+
+                                    </ul>
+                                </div>
+                            </div>
+
+                        </div>
+                        <hr class="my-4">
+
+                        <div class="tab-content bg-transparent">
+                            <div id="note-full-container" class="note-has-grid row justify-content-center">
+                                <% if (notes.length && Array.isArray(notes)) { %>
+                                    <% notes.forEach(function(note) { %>
+                                        <div class="col-md-9 single-note-item all-category mb-3">
+                                            <div class=" bg-white rounded-1 p-4 row">
+                                                <div class="col-md-4">
+                                                    <div style="height: 200px" class="mb-3">
+                                                        <img class="note-image-content image-container"
+                                                            src="<%= note.image %>" width="200px" height="100%"
+                                                            style="object-fit:cover  ;" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div class="d-flex justify-content-between">
+                                                        <h4 class="note-title text-truncate w-75 mb-3"
+                                                            data-noteheading="Book a Ticket for Movie">
+                                                            <%= note.name %>
+                                                        </h4>
+                                                        <p class="text-bg-dark p-2 rounded-4">Author - <%=note.author%>
+                                                        </p>
+                                                    </div>
+                                                    <p class="note-date font-12 text-muted">
+                                                        <%= moment(note.created_at) %>
+                                                    </p>
+                                                    <div class="note-content">
+                                                        <!-- <p class="note-inner-content text-muted text-wrap" data-textquill="<%=note.description %>"> -->
+                                                        <p class="note-inner-content text-muted text-wrap">
+                                                            <%- note.description %>
+                                                        </p>
+                                                    </div>
+
+
+                                                </div>
+                                                <!-- Notes will be deleted later -->
+                                                <div class="d-flex align-items-center justify-content-end">
+                                                    <% if (note.shared_role==true) { %>
+                                                        <div>
+                                                            <button class="mr-1 edit-note" data-bs-toggle="modal"
+                                                                data-bs-target="#update-notes-modal"
+                                                                data-noteid="<%= note.id %>"><i
+                                                                    class="fa fa-edit"></i></button>
+                                                        </div>
+                                                        <% } else { %>
+
+                                                            <button class="mr-1 btn btn-light border-radius-4 border-dark" data-bs-toggle="modal"
+                                                                data-bs-target="#update-notes-modal"
+                                                                data-noteid="<%= note.id %>">Request editing
+                                                                permission</button>
+                                                            <% } %>
+                                                </div>
+                                                <% if (note.cancel_at && note.created_at && note.cancel_at.getTime()
+                                                    !==note.created_at.getTime()) { %>
+                                                    <div class="note-content">
+                                                        <p class="note-inner-time mt-3 p-2 text-center text-bg-warning text-white fw-bold"
+                                                            data-time="<%=moment(note.cancel_at)%>">
+                                                            Canceled at: <%= moment(note.cancel_at)%>
+                                                        </p>
+                                                    </div>
+                                                    <% } %>
+                                            </div>
+                                        </div>
+                                        <% }) %>
+                                            <% } else { %>
+                                                <p class="text-center">No notes available.</p>
+                                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+</section>
