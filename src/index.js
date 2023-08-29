@@ -15,9 +15,11 @@ const flash = require('connect-flash')
 const { DateTime } = require('luxon')
 const noteManager = require('./ultils/noteManager');
 const errorHandlers = require('./middlewares/errorHandlers')
-// const flatpickrSetup = require('./ultils/flatpickr-setup');
-
+const http = require('http');
+const socketManager = require('./ultils/socketManager');
 let app = express();
+const server = http.createServer(app);
+socketManager.initializeSocket(server);
 app.use(cookieParser('SecretStringForCookie'));
 middBasic(app);
 configApp(app);
@@ -35,7 +37,7 @@ app.use(errorHandlers);
 DateTime.local().setZone('Asia/Ho_Chi_Minh');
 noteManager.startJobs();
 
-app.listen(port, async () => {
+server.listen(port, async () => {
     console.log("Servidor corriendo en el puerto " + port);
     
     try {

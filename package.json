@@ -50,7 +50,9 @@
     "quill-delta": "^5.1.0",
     "quill-delta-to-html": "^0.12.1",
     "sequelize": "^6.32.1",
-    "sharp": "^0.32.5"
+    "sharp": "^0.32.5",
+    "socket.io": "^4.7.2",
+    "sweetalert2": "^11.7.27"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",

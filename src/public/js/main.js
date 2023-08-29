@@ -57,4 +57,12 @@ function delImg(img) {
     parent.find('.imgUrl').attr('value', '')
     $(img).remove()
   }
-
+  // function displayErrorNotification(errorMessage) {
+  //   Swal.fire({
+  //     title: 'Error!',
+  //     text: errorMessage,
+  //     icon: 'error',
+  //     showConfirmButton: false,
+  //     timer: 1500,
+  //   });
+  // }

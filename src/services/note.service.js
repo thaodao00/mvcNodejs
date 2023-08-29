@@ -3,10 +3,11 @@ const fs = require('fs')
 const util = require('util')
 const unlinkFile = util.promisify(fs.unlink)
 const models = require('../models');
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt');
 const schedule = require('node-schedule');
 const jobManager = require('../ultils/noteManager');
-const encryption = require('../ultils/encryption');
+const socketManager = require('../ultils/socketManager');
+// const encryption = require('../ultils/encryption');
 let getNoteByName = async (name) => {
     return await models.Note.findOne({
         where: {
@@ -95,6 +96,10 @@ let deleteNote = async (noteId) => {
         if (imagePath) {
             await unlinkFile(imagePath);
         }
+    }
+    const io = socketManager.getSocketIOInstance();
+    if (io) {
+        io.emit('noteDeleted', `Canceled note ${note.name} successfully`);
     }
 
 }
