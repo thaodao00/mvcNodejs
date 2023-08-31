@@ -7,6 +7,7 @@ const QuillDeltaToHtmlConverter = require('quill-delta-to-html').QuillDeltaToHtm
 const serviceNote = require('./../services/note.service');
 const serviceUser = require('./../services/user.service');
 const { uploader, viewImage } = require('./../middlewares/upload');
+const { sendEditRequestEmail } = require('./../ultils/emailer');
 
 // Get all note
 let getAllNotes = async (req, res) => {
@@ -131,11 +132,11 @@ const uploadImage = async (req, res) => {
     }
 
 }
-//Get shared notes
+//Get all notes public
 let getNotesPublic = async (req, res) => {
     try {
         const notes = await serviceNote.getAllNote()
-        const updateNote =[]
+        const updateNote = []
         for (const note of notes) {
             const id = note.user_id;
             const user = await serviceUser.getUserById(id);
@@ -165,12 +166,68 @@ let shareNote = async (req, res) => {
     try {
         let noteId = req.params.id;
         const noteShared = await serviceNote.sharedNote(noteId, req.body);
-        console.log("_________________note", noteShared);
+        // console.log("_________________note", noteShared);
         res.redirect('/home');
     } catch (e) {
         console.log(e);
         return res.status(500).send(e.message);
     }
+}
+let changeSharedNote = async (req, res) => {
+
+    try {
+        let noteId = req.params.id;
+        let note = await serviceNote.getNoteById(noteId);
+        let user = await serviceUser.getUserById(note.user_id);
+
+        sendEditRequestEmail(user.email, "Request editing permission", `Someone wants you to open the right to edit note ${note.name}.`)
+            .then(response => {
+                console.log('Email sent successfully:', response);
+            
+            })
+            .catch(error => {
+                console.error('Error sending email:', error);
+        
+            });
+
+        res.redirect('/notes');
+    } catch (e) {
+        console.log(e);
+        return res.status(500).send(e.message);
+    }
+};
+let editNoteByUses = async (req, res) => {
+    try {
+        let noteId = req.params.id;
+
+        // const noteCurrent = await serviceNote.getNoteById(noteId);
+        const note = await serviceNote.getNoteById(noteId);
+        const user = await serviceUser.getUserById(note.user_id);
+       
+        
+        note.descriptionNote = encryption.encryptData(req.body.descriptionNote, user.secretKey);
+        console.log('------------image', req.user,);
+
+        let updated = await serviceNote.editByUsers(noteId,  note.descriptionNote);
+        console.log(req.user);
+        if (updated) {
+            sendEditRequestEmail(user.email, "Edited notes", `Note ${note.name} has been edited by ${req.user.email}.`)
+            // Nếu có ảnh mới và khác với ảnh cũ, xóa ảnh cũ
+            // if (note.img && noteCurrent.image) {
+            //     const imagePath = `src/public/uploads/${noteCurrent.image}`;
+            //     await unlinkFile(imagePath);
+
+            // }
+            // sendEditRequestEmail()
+
+            res.redirect('/notes');
+        }
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).send(e.message);
+    }
+
 }
 module.exports = {
     getAllNotes: getAllNotes,
@@ -179,5 +236,7 @@ module.exports = {
     updateNote: updateNote,
     uploadImage: uploadImage,
     deleteNote: deleteNote,
-    shareNote : shareNote
+    shareNote: shareNote,
+    changeSharedNote: changeSharedNote,
+    editNoteByUses:editNoteByUses
 }

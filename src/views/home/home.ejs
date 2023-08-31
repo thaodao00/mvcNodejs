@@ -21,7 +21,9 @@
                   </button>
                   <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="/notes">
-                      Shared notes list
+                      <li><a class="dropdown-item" href="/notes">
+                        List of notes shared publicly
+                        </a></li>
                       </a></li>
                     <li><a class="dropdown-item" href="#">
                         <div type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">New Note</div>
@@ -283,7 +285,7 @@
               <div>
                 <div class="mb-3">You want to share notes on the public</div>
                 <!-- <input type="hidden" id="delete-note-id" name="noteDeleteId"> -->
-                <label>Power</label>
+                <label>Public</label>
                 <select class="p-2 w-100 mb-2" name="share_role">
                   <option value="0">Show</option>
                   <option value="1">Edit</option>
@@ -361,11 +363,10 @@
     shareButtons.forEach(button => {
       button.addEventListener('click', function () {
         const noteId = this.getAttribute('data-noteidshare');
-        alert(noteId);
+        // alert(noteId);
         const formAction = `/share-note/${noteId}`;
         shareForm.setAttribute('action', formAction);
-        // const shareNoteIdField = document.querySelector('#share-note-id');
-        // shareNoteIdField.value = noteId;
+  
       });
     })
 

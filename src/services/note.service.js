@@ -6,7 +6,9 @@ const models = require('../models');
 const schedule = require('node-schedule');
 const jobManager = require('../ultils/noteManager');
 const socketManager = require('../ultils/socketManager');
-
+const { sendEditRequestEmail } = require('../ultils/emailer');
+const serviceUser = require('./user.service');
+const { get } = require('jquery');
 let getAllNote = async () => {
     return await models.Note.findAll({
         order: [
@@ -17,16 +19,35 @@ let getAllNote = async () => {
         }
     })
 }
-let sharedNote = async (noteId,body) => {
+let sharedNote = async (noteId, body) => {
     return await models.Note.update({
         shared_role: body.share_role,
-        shared : 1
+        shared: 1
     }, {
         where: {
             id: noteId
         }
     })
 
+}
+let changeSharedNote = async (noteId) => {
+    return await models.Note.update({
+        share_role: 1
+    }, {
+        where: {
+            id: noteId
+        }
+    })
+}
+let editByUsers = async (noteId, body) => {
+    return await models.Note.update({
+        description: body,
+
+    }, {
+        where: {
+            id: noteId
+        }
+    })
 }
 let getNoteByName = async (name) => {
     return await models.Note.findOne({
@@ -81,7 +102,7 @@ let updateNote = async (body, noteId) => {
 
             // Tìm ghi chú sau khi cập nhật
             const newNote = await models.Note.findByPk(noteId);
-
+            const user = await serviceUser.getUserById(newNote.user_id);
             if (newNote.cancel_at !== null) {
                 const job = schedule.scheduleJob(newNote.cancel_at, async () => {
                     await deleteNote(newNote.id);
@@ -94,11 +115,13 @@ let updateNote = async (body, noteId) => {
             const notificationDate = new Date(cancelDate.getTime() - 60 * 60 * 1000); // Trừ đi 1 tiếng
             const currentTime = new Date();
             const timeUntilNotification = notificationDate - currentTime;
-            const io = socketManager.getSocketIOInstance();
+            // const io = socketManager.getSocketIOInstance();
 
             if (timeUntilNotification > 0) {
                 const notificationJob = schedule.scheduleJob(notificationDate, () => {
-                    io.emit('noteAboutToBeCancelled', `Note ${newNote.name} will be cancelled in 1 hour.`);
+                    // io.emit('noteAboutToBeCancelled', `Note ${newNote.name} will be cancelled in 1 hour.`);
+                    sendEditRequestEmail(user.email, "Cancel notes after 1 hour!", `Note ${newNote.name} will cancel after 1 hour.`)
+
                 });
 
                 jobManager.addJob(notificationJob, newNote.id, true); // Đánh dấu là công việc thông báo
@@ -118,23 +141,26 @@ let updateNote = async (body, noteId) => {
 }
 let deleteNote = async (noteId) => {
     const note = await getNoteById(noteId);
+    const user = await serviceUser.getUserById(note.user_id);
     await models.Note.destroy({
         where: {
             id: noteId
         }
     });
+
     if (note?.image && note?.image !== "" && note?.image !== undefined) {
         const imagePath = `src/public/uploads/${note?.image}`;
         if (imagePath) {
             await unlinkFile(imagePath);
         }
     }
-    const io = socketManager.getSocketIOInstance();
-    console.log('io:__________________', io);
+    // const io = socketManager.getSocketIOInstance();
+    // console.log('io:__________________', io);
 
-    if (io) {
-        io.emit('noteDeleted', `Canceled note ${note.name} successfully`);
-    }
+    // if (io) {
+    //     io.emit('noteDeleted', `Canceled note ${note.name} successfully`);
+    // }
+    sendEditRequestEmail(user.email, "Delete note success!", `Delete note ${note.name} successfully.`)
 }
 
 const createNote = async (body) => {
@@ -153,7 +179,7 @@ const createNote = async (body) => {
             if (cancelDate > new Date()) {
                 note.cancel_at = cancelDate;
                 const newNote = await models.Note.create(note);
-
+                const user = await serviceUser.getUserById(newNote.user_id);
                 if (newNote.cancel_at !== null) {
                     const job = schedule.scheduleJob(newNote.cancel_at, async () => {
                         await deleteNote(newNote.id);
@@ -165,11 +191,13 @@ const createNote = async (body) => {
                 const notificationDate = new Date(cancelDate.getTime() - 60 * 60 * 1000); // Trừ đi 1 tiếng
                 const currentTime = new Date();
                 const timeUntilNotification = notificationDate - currentTime;
-                const io = socketManager.getSocketIOInstance();
+                // const io = socketManager.getSocketIOInstance();
 
                 if (timeUntilNotification > 0) {
                     const notificationJob = schedule.scheduleJob(notificationDate, () => {
-                        io.emit('noteAboutToBeCancelled', `Note ${newNote.name} will be cancelled in 1 hour.`);
+                        // io.emit('noteAboutToBeCancelled', `Note ${newNote.name} will be cancelled in 1 hour.`);
+                    sendEditRequestEmail(user.email, "Cancel notes after 1 hour!", `Note ${newNote.name} will cancel after 1 hour.`)
+
                     });
 
                     jobManager.addJob(notificationJob);
@@ -196,6 +224,8 @@ module.exports = {
     deleteNote: deleteNote,
     getNoteById: getNoteById,
     getAllNote: getAllNote,
-    sharedNote:sharedNote
+    sharedNote: sharedNote,
+    changeSharedNote: changeSharedNote,
+    editByUsers: editByUsers
 
 }
