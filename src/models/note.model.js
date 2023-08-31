@@ -37,7 +37,15 @@ module.exports = (sequelize, DataTypes) => {
         },
         cancel_at: {
             type: DataTypes.DATE,
-          }
+          },
+        shared: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: 0
+        },
+        shared_role: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: 0
+        },
     }, {
         sequelize,
         modelName: 'Note',

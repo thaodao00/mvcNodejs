@@ -4,7 +4,13 @@ const models = require('../models');
 const bcrypt = require('bcrypt');
 
 //tìm kiếm tk theo email
-
+let getUserById = async (id) => {
+    return await models.User.findOne({
+        where: {
+            id: id
+        }
+    })
+}
 let findUserByEmail = async (email) => {
     return await models.User.findOne({
         where: {
@@ -56,5 +62,6 @@ module.exports = {
     createUser: createUser,
     getAll: getAll,
     updateRole: updateRole,
-    deleteUser: deleteUser
+    deleteUser: deleteUser,
+    getUserById: getUserById
 }

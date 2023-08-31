@@ -57,4 +57,3 @@ function delImg(img) {
     parent.find('.imgUrl').attr('value', '')
     $(img).remove()
   }
-
