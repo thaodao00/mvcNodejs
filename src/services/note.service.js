@@ -8,6 +8,10 @@ const jobManager = require('../ultils/noteManager');
 const socketManager = require('../ultils/socketManager');
 const { sendEditRequestEmail } = require('../ultils/emailer');
 const serviceUser = require('./user.service');
+const { Op } = require('sequelize');
+const encryption = require('../ultils/encryption');
+const QuillDeltaToHtmlConverter = require('quill-delta-to-html').QuillDeltaToHtmlConverter;
+
 
 //Lấy tất cả các note ở chế độ public
 let getAllNote = async (page, pageSize) => {
@@ -35,16 +39,6 @@ let getAllNote = async (page, pageSize) => {
     }
 
 }
-// let getAllNote = async () => {
-//     return await models.Note.findAll({
-//         order: [
-//             ['created_at', 'DESC'] // Sắp xếp theo trường created_at từ mới đến cũ
-//         ],
-//         where: {
-//             shared: 1
-//         }
-//     })
-// }
 let sharedNote = async (noteId, body) => {
     return await models.Note.update({
         shared_role: body.share_role,
@@ -89,6 +83,46 @@ let getNoteById = async (id) => {
         }
     })
 }
+
+const searchNotes = async (userId, searchTerm, page, pageSize) => {
+    const notesFromDatabase = await getNotes(userId);
+    const offset = (page - 1) * pageSize;
+    const searchTermLower = searchTerm.toLowerCase(); 
+    const user = await serviceUser.getUserById(userId);
+    // Lấy danh sách ghi chú từ cơ sở dữ liệu
+    const { count: totalCount } = await models.Note.findAndCountAll({
+        where: {
+            user_id: userId
+        },
+        offset: offset,
+        limit: pageSize,
+        order: [['created_at', 'DESC']]
+    });
+
+    // Tìm kiếm trong nội dung văn bản
+    let matchingNotes = [];
+   
+    for (const encryptedNote of notesFromDatabase) {
+        const ex = encryption.decryptData(encryptedNote.description, user.secretKey);
+        const delta = JSON.parse(ex);
+        const delte = JSON.parse(delta);
+        const converter = new QuillDeltaToHtmlConverter(delte.ops, {});
+        const htmlContent = converter.convert();
+        if (htmlContent && htmlContent.toLowerCase().includes(searchTermLower)) {
+            matchingNotes.push(encryptedNote);
+        }
+    }
+    const endIndex = Math.min(offset + pageSize, matchingNotes.length);
+    const totalPages = Math.ceil(matchingNotes.length / pageSize);
+    matchingNotes = matchingNotes.slice(offset, endIndex);
+
+    return {
+        notes: matchingNotes,
+        currentPage: page,
+        totalPages: totalPages,
+        limit: pageSize
+    };
+};
 //lấy tất cả post của user
 let getAllNoteByUser = async (userId, page, pageSize) => {
     const offset = (page - 1) * pageSize;
@@ -109,16 +143,16 @@ let getAllNoteByUser = async (userId, page, pageSize) => {
     }
 }
 
-// let getAllNoteByUser = async (userId) => {
-//     return await models.Note.findAll({
-//         where: {
-//             'user_id': userId
-//         },
-//         order: [
-//             ['created_at', 'DESC'] // Sắp xếp theo trường created_at từ mới đến cũ
-//         ]
-//     })
-// }
+let getNotes = async (userId) => {
+    return await models.Note.findAll({
+        where: {
+            'user_id': userId
+        },
+        order: [
+            ['created_at', 'DESC'] // Sắp xếp theo trường created_at từ mới đến cũ
+        ]
+    })
+}
 let updateNote = async (body, noteId) => {
     let updateNote = {
         name: body.nameNote,
@@ -270,6 +304,7 @@ module.exports = {
     getAllNote: getAllNote,
     sharedNote: sharedNote,
     changeSharedNote: changeSharedNote,
-    editByUsers: editByUsers
-
+    editByUsers: editByUsers,
+    searchNotes: searchNotes,
+    getNotes: getNotes
 }

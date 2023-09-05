@@ -8,16 +8,26 @@ const serviceNote = require('./../services/note.service');
 const serviceUser = require('./../services/user.service');
 const { uploader, viewImage } = require('./../middlewares/upload');
 const { sendEditRequestEmail } = require('./../ultils/emailer');
+const Delta = require('quill-delta');
+const e = require('connect-flash');
 var loading = false
 // Get all notes by user
 let getAllNotes = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 2;
     const userId = req.user.userId;
+    const searchTerm = req.query.searchTerm;
 
-    console.log("userId___________________", req.user);
     try {
-        const listNote = await serviceNote.getAllNoteByUser(userId,page,pageSize);
+        let listNote;
+        if (searchTerm) {
+            listNote = await serviceNote.searchNotes(userId,searchTerm , page, pageSize);
+            
+            console.log("listNote___________________", listNote.currentPage, listNote.totalPages, pageSize,listNote.notes.length);
+        } else {
+            listNote = await serviceNote.getAllNoteByUser(userId, page, pageSize);
+
+        }
         for (const note of listNote.notes) {
             const ex = encryption.decryptData(note.description, req.user.secretKey);
             const delta = JSON.parse(ex);
@@ -27,13 +37,14 @@ let getAllNotes = async (req, res) => {
             const imagePath = await viewImage(note.image);
             note.image = imagePath;
         }
-        console.log("pag_________", listNote.currentPage, listNote.totalPages,pageSize);
+        // console.log("pag_________", listNote.currentPage, listNote.totalPages, pageSize);
         res.render("index", {
             view_content: 'home/home',
             notes: listNote.notes,
             currentPage: listNote.currentPage,
             totalPages: listNote.totalPages,
             pageSize: pageSize,
+            searchTerm: searchTerm,
             flash: req.flash()
         });
 
@@ -144,11 +155,11 @@ const uploadImage = async (req, res) => {
 var loading = false
 
 let getNotesPublic = async (req, res) => {
-    const page = parseInt(req.query.page)||1
-    const pageSize = parseInt(req.query.pageSize)||2;
+    const page = parseInt(req.query.page) || 1
+    const pageSize = parseInt(req.query.pageSize) || 2;
 
-        try {
-        const listNotes = await serviceNote.getAllNote(page,pageSize)
+    try {
+        const listNotes = await serviceNote.getAllNote(page, pageSize)
         const updateNote = []
         for (const note of listNotes.notes) {
             const id = note.user_id;
@@ -163,15 +174,15 @@ let getNotesPublic = async (req, res) => {
             note.author = user.name;
             updateNote.push(note)
         }
-               console.log("pagss_________", listNotes.currentPage, listNotes.totalPages,pageSize);
+        console.log("pagss_________", listNotes.currentPage, listNotes.totalPages, pageSize);
 
         res.render("index", {
             view_content: 'home/notes',
             notes: updateNote,
             isLoading: loading,
-            totalPages:listNotes.totalPages,
-            currentPage:listNotes.currentPage,
-            pageSize:pageSize,
+            totalPages: listNotes.totalPages,
+            currentPage: listNotes.currentPage,
+            pageSize: pageSize,
             flash: req.flash()
         });
 
