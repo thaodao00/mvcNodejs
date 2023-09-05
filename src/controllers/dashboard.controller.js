@@ -2,17 +2,6 @@
 const brypt = require('bcrypt');
 const serviceUser = require('../services/user.service');
 let getAllUser = async (req, res) => {
-    // try {
-    //     const users = await serviceUser.getAll();
-    //     res.render("index", {
-    //         view_content: 'admin/dashboard',
-    //         users: users
-    //     });
-
-    // } catch (error) {
-    //     console.error(error);
-    //     res.status(500).send(error.message);
-    // }
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 2;
 
@@ -31,18 +20,6 @@ let getAllUser = async (req, res) => {
         res.status(500).send(error.message);
     }
 }
-// app.get('/api/pagination', async (req, res) => {
-//     const page = parseInt(req.query.page) || 1;
-//     const pageSize = parseInt(req.query.pageSize) || 10;
-
-//     try {
-//       const users = await paginationService.paginateUsers(page, pageSize);
-//       res.json(users);
-//     } catch (err) {
-//       console.error('Lỗi truy vấn: ' + err);
-//       res.status(500).send('Lỗi truy vấn');
-//     }
-//   });
 let addUser = async (req, res) => {
     const { name, email, password, role } = req.body;
 

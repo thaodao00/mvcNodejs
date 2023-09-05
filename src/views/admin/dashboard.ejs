@@ -77,19 +77,12 @@
 								<% } %>
 			</tbody>
 		</table>
+		<% if (totalPages > 1) { %>
 		<div>
-			<!-- <ul class="pagination">
-				
-			  <% for (let i = 1; i <= totalPages; i++) { %>
-				<li class="<%= (i === currentPage) ? 'active' : '' %>">
-				  <a href="/dashboard?page=<%= i %>&pageSize=<%= pageSize %>"><%= i %></a>
-				</li>
-			  <% } %>
-			</ul> -->
 			<nav aria-label="Page navigation example">
 				<ul class="pagination">
 					<li class="page-item <%= (currentPage === 1) ? 'disabled' : '' %>">
-						<a class="page-link" href="/dashboard?page=<%= currentPage - 1 %>&pageSize=<%= pageSize %> aria-label="Previous">
+						<a class="page-link" href="/dashboard?page=<%= currentPage - 1 %>&pageSize=<%= pageSize %>" aria-label="Previous">
 							<span aria-hidden="true">&laquo;</span>
 						</a>
 					</li>
@@ -103,13 +96,14 @@
 						</li>
 						<% } %>
 							<li class="page-item <%= (currentPage === totalPages) ? 'disabled' : '' %>">
-								<a class="page-link" href="/dashboard?page=<%= currentPage + 1 %>&pageSize=<%= pageSize %> aria-label="Next">
+								<a class="page-link" href="/dashboard?page=<%= currentPage + 1 %>&pageSize=<%= pageSize %>" aria-label="Next">
 									<span aria-hidden="true">&raquo;</span>
 								</a>
 							</li>
 				</ul>
 			</nav>
 		</div>
+		<% } %>
 	</div>
 	<!-- Add Modal HTML -->
 	<div id="addEmployeeModal" class="modal fade">

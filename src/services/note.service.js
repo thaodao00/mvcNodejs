@@ -8,17 +8,43 @@ const jobManager = require('../ultils/noteManager');
 const socketManager = require('../ultils/socketManager');
 const { sendEditRequestEmail } = require('../ultils/emailer');
 const serviceUser = require('./user.service');
-const { get } = require('jquery');
-let getAllNote = async () => {
-    return await models.Note.findAll({
-        order: [
-            ['created_at', 'DESC'] // Sắp xếp theo trường created_at từ mới đến cũ
-        ],
+
+//Lấy tất cả các note ở chế độ public
+let getAllNote = async (page, pageSize) => {
+    const offset = (page - 1) * pageSize;
+    const notes = await models.Note.findAll({
+        order: [['created_at', 'DESC']],
         where: {
             shared: 1
+        },
+        offset: offset,
+        limit: pageSize,
+
+
+    })
+    const totalCount = await models.Note.count({
+        where: {
+            shared: 1 // Thay userId bằng giá trị userID mà bạn muốn sử dụng
         }
     })
+    const totalPages = Math.ceil(totalCount / pageSize);
+    return {
+        notes: notes,
+        currentPage: page,
+        totalPages: totalPages
+    }
+
 }
+// let getAllNote = async () => {
+//     return await models.Note.findAll({
+//         order: [
+//             ['created_at', 'DESC'] // Sắp xếp theo trường created_at từ mới đến cũ
+//         ],
+//         where: {
+//             shared: 1
+//         }
+//     })
+// }
 let sharedNote = async (noteId, body) => {
     return await models.Note.update({
         shared_role: body.share_role,
@@ -64,17 +90,35 @@ let getNoteById = async (id) => {
     })
 }
 //lấy tất cả post của user
-
-let getAllNoteByUser = async (userId) => {
-    return await models.Note.findAll({
-        where: {
-            'user_id': userId
-        },
-        order: [
-            ['created_at', 'DESC'] // Sắp xếp theo trường created_at từ mới đến cũ
-        ]
+let getAllNoteByUser = async (userId, page, pageSize) => {
+    const offset = (page - 1) * pageSize;
+    const notes = await models.Note.findAll({
+        order: [['created_at', 'DESC']],
+        where: { 'user_id': userId },
+        offset: offset,
+        limit: pageSize
     })
+    const totalCount = await models.Note.count({
+        where: { 'user_id': userId },
+    })
+    const totalPages = Math.ceil(totalCount / pageSize);
+    return {
+        notes: notes,
+        currentPage: page,
+        totalPages: totalPages
+    }
 }
+
+// let getAllNoteByUser = async (userId) => {
+//     return await models.Note.findAll({
+//         where: {
+//             'user_id': userId
+//         },
+//         order: [
+//             ['created_at', 'DESC'] // Sắp xếp theo trường created_at từ mới đến cũ
+//         ]
+//     })
+// }
 let updateNote = async (body, noteId) => {
     let updateNote = {
         name: body.nameNote,
@@ -196,7 +240,7 @@ const createNote = async (body) => {
                 if (timeUntilNotification > 0) {
                     const notificationJob = schedule.scheduleJob(notificationDate, () => {
                         // io.emit('noteAboutToBeCancelled', `Note ${newNote.name} will be cancelled in 1 hour.`);
-                    sendEditRequestEmail(user.email, "Cancel notes after 1 hour!", `Note ${newNote.name} will cancel after 1 hour.`)
+                        sendEditRequestEmail(user.email, "Cancel notes after 1 hour!", `Note ${newNote.name} will cancel after 1 hour.`)
 
                     });
 

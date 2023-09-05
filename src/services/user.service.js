@@ -3,7 +3,7 @@
 const models = require('../models');
 const bcrypt = require('bcrypt');
 
-//tìm kiếm tk theo email
+//tìm kiếm tk theo id
 let getUserById = async (id) => {
     return await models.User.findOne({
         where: {
@@ -40,13 +40,7 @@ let createUser = async (body) => {
 //         order: [['created_at', 'DESC']]
 //     });
 // }
-async function getAll(page, pageSize) {
-    // const offset = (page - 1) * pageSize;
-    // return await models.User.findAll({
-    //     order: [['created_at', 'DESC']],
-    //     offset: offset,
-    //     limit: pageSize
-    // });
+let getAll = async (page, pageSize)=> {
     const offset = (page - 1) * pageSize;
     const users = await models.User.findAll({
         order: [['created_at', 'DESC']],

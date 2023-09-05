@@ -21,10 +21,9 @@
                   </button>
                   <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="/notes">
-                      <li><a class="dropdown-item" href="/notes">
                         List of notes shared publicly
-                        </a></li>
                       </a></li>
+                    </a></li>
                     <li><a class="dropdown-item" href="#">
                         <div type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">New Note</div>
                       </a></li>
@@ -54,10 +53,11 @@
                             <h4 class="note-title text-truncate w-75 mb-3" data-noteheading="Book a Ticket for Movie">
                               <%= note.name %>
                             </h4>
-                            <button class="share-note p-2 border-0 bg-transparent" data-bs-toggle="modal" data-bs-target="#share-notes-modal"
-                            data-noteidshare="<%= note.id %>"><i class="fa fa-share"></i></button>
+                            <button class="share-note p-2 border-0 bg-transparent" data-bs-toggle="modal"
+                              data-bs-target="#share-notes-modal" data-noteidshare="<%= note.id %>"><i
+                                class="fa fa-share"></i></button>
                           </div>
-                       
+
                           <p class="note-date font-12 text-muted">
                             <%= moment(note.created_at) %>
                           </p>
@@ -96,9 +96,39 @@
                         <% } %>
               </div>
             </div>
+         
           </div>
         </div>
       </div>
+      <% if (totalPages >1) { %>
+        <div class="mt-4 d-flex justify-content-center">
+          <nav aria-label="Page navigation example">
+            <ul class="pagination">
+              <li class="page-item <%= (currentPage === 1) ? 'disabled' : '' %>">
+                <a class="page-link" href="/home?page=<%= currentPage - 1 %>&pageSize=<%= pageSize %>"
+                  aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+
+              <% for (let i=1; i <=totalPages; i++) { %>
+
+                <li class="<%= (i === currentPage) ? 'active' : '' %> page-item">
+                  <a class="page-link" href="/home?page=<%= i %>&pageSize=<%= pageSize %>">
+                    <%= i %>
+                  </a>
+                </li>
+                <% } %>
+                  <li class="page-item <%= (currentPage === totalPages) ? 'disabled' : '' %>">
+                    <a class="page-link"
+                      href="/home?page=<%= currentPage + 1 %>&pageSize=<%= pageSize %>" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                    </a>
+                  </li>
+            </ul>
+          </nav>
+        </div>
+        <%}%>
 </section>
 <!-- modal add -->
 <section>
@@ -359,18 +389,18 @@
         deleteNoteIdField.value = noteId;
       });
     })
-    
+
     shareButtons.forEach(button => {
       button.addEventListener('click', function () {
         const noteId = this.getAttribute('data-noteidshare');
         // alert(noteId);
         const formAction = `/share-note/${noteId}`;
         shareForm.setAttribute('action', formAction);
-  
+
       });
     })
 
-  
+
   });
 </script>
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>

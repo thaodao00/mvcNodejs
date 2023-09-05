@@ -9,13 +9,16 @@ const serviceUser = require('./../services/user.service');
 const { uploader, viewImage } = require('./../middlewares/upload');
 const { sendEditRequestEmail } = require('./../ultils/emailer');
 var loading = false
-// Get all note
+// Get all notes by user
 let getAllNotes = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 2;
     const userId = req.user.userId;
+
     console.log("userId___________________", req.user);
     try {
-        const notes = await serviceNote.getAllNoteByUser(userId);
-        for (const note of notes) {
+        const listNote = await serviceNote.getAllNoteByUser(userId,page,pageSize);
+        for (const note of listNote.notes) {
             const ex = encryption.decryptData(note.description, req.user.secretKey);
             const delta = JSON.parse(ex);
             const converter = new QuillDeltaToHtmlConverter(JSON.parse(delta).ops, {});
@@ -24,9 +27,13 @@ let getAllNotes = async (req, res) => {
             const imagePath = await viewImage(note.image);
             note.image = imagePath;
         }
+        console.log("pag_________", listNote.currentPage, listNote.totalPages,pageSize);
         res.render("index", {
             view_content: 'home/home',
-            notes: notes,
+            notes: listNote.notes,
+            currentPage: listNote.currentPage,
+            totalPages: listNote.totalPages,
+            pageSize: pageSize,
             flash: req.flash()
         });
 
@@ -35,6 +42,7 @@ let getAllNotes = async (req, res) => {
         res.status(500).send(error.message);
     }
 }
+
 //Create note
 let createNote = async (req, res) => {
     const userId = req.user.userId;
@@ -132,14 +140,17 @@ const uploadImage = async (req, res) => {
     }
 
 }
-//Get all notes 
+//Get all notes public
 var loading = false
 
 let getNotesPublic = async (req, res) => {
-    try {
-        const notes = await serviceNote.getAllNote()
+    const page = parseInt(req.query.page)||1
+    const pageSize = parseInt(req.query.pageSize)||2;
+
+        try {
+        const listNotes = await serviceNote.getAllNote(page,pageSize)
         const updateNote = []
-        for (const note of notes) {
+        for (const note of listNotes.notes) {
             const id = note.user_id;
             const user = await serviceUser.getUserById(id);
             const ex = encryption.decryptData(note.description, user.secretKey);
@@ -152,10 +163,15 @@ let getNotesPublic = async (req, res) => {
             note.author = user.name;
             updateNote.push(note)
         }
+               console.log("pagss_________", listNotes.currentPage, listNotes.totalPages,pageSize);
+
         res.render("index", {
             view_content: 'home/notes',
             notes: updateNote,
             isLoading: loading,
+            totalPages:listNotes.totalPages,
+            currentPage:listNotes.currentPage,
+            pageSize:pageSize,
             flash: req.flash()
         });
 
@@ -182,18 +198,18 @@ let changeSharedNote = async (req, res) => {
         let noteId = req.params.id;
         let note = await serviceNote.getNoteById(noteId);
         let user = await serviceUser.getUserById(note.user_id);
-        loading=true
+        loading = true
         sendEditRequestEmail(user.email, "Request editing permission", `Someone wants you to open the right to edit note ${note.name}.`)
             .then(response => {
-                loading=false
+                loading = false
                 console.log('Email sent successfully:', response);
             })
             .catch(error => {
-                loading=false
+                loading = false
                 console.error('Error sending email:', error);
-        
+
             });
-            loading=false
+        loading = false
         res.redirect('/notes');
     } catch (e) {
         console.log(e);
@@ -207,12 +223,12 @@ let editNoteByUses = async (req, res) => {
 
         const note = await serviceNote.getNoteById(noteId);
         const user = await serviceUser.getUserById(note.user_id);
-       
-        
+
+
         note.descriptionNote = encryption.encryptData(req.body.descriptionNote, user.secretKey);
         console.log('------------image', req.user,);
 
-        let updated = await serviceNote.editByUsers(noteId,  note.descriptionNote);
+        let updated = await serviceNote.editByUsers(noteId, note.descriptionNote);
         console.log(req.user);
         if (updated) {
             sendEditRequestEmail(user.email, "Edited notes", `Note ${note.name} has been edited by ${req.user.email}.`)
@@ -234,5 +250,5 @@ module.exports = {
     deleteNote: deleteNote,
     shareNote: shareNote,
     changeSharedNote: changeSharedNote,
-    editNoteByUses:editNoteByUses
+    editNoteByUses: editNoteByUses
 }
