@@ -8,7 +8,7 @@ const serviceNote = require('./../services/note.service');
 const serviceUser = require('./../services/user.service');
 const { uploader, viewImage } = require('./../middlewares/upload');
 const { sendEditRequestEmail } = require('./../ultils/emailer');
-
+var loading = false
 // Get all note
 let getAllNotes = async (req, res) => {
     const userId = req.user.userId;
@@ -132,7 +132,9 @@ const uploadImage = async (req, res) => {
     }
 
 }
-//Get all notes public
+//Get all notes 
+var loading = false
+
 let getNotesPublic = async (req, res) => {
     try {
         const notes = await serviceNote.getAllNote()
@@ -153,6 +155,7 @@ let getNotesPublic = async (req, res) => {
         res.render("index", {
             view_content: 'home/notes',
             notes: updateNote,
+            isLoading: loading,
             flash: req.flash()
         });
 
@@ -174,33 +177,34 @@ let shareNote = async (req, res) => {
     }
 }
 let changeSharedNote = async (req, res) => {
-
+    // showLoadingSpinner()
     try {
         let noteId = req.params.id;
         let note = await serviceNote.getNoteById(noteId);
         let user = await serviceUser.getUserById(note.user_id);
-
+        loading=true
         sendEditRequestEmail(user.email, "Request editing permission", `Someone wants you to open the right to edit note ${note.name}.`)
             .then(response => {
+                loading=false
                 console.log('Email sent successfully:', response);
-            
             })
             .catch(error => {
+                loading=false
                 console.error('Error sending email:', error);
         
             });
-
+            loading=false
         res.redirect('/notes');
     } catch (e) {
         console.log(e);
         return res.status(500).send(e.message);
     }
+    // hideLoadingSpinner()
 };
 let editNoteByUses = async (req, res) => {
     try {
         let noteId = req.params.id;
 
-        // const noteCurrent = await serviceNote.getNoteById(noteId);
         const note = await serviceNote.getNoteById(noteId);
         const user = await serviceUser.getUserById(note.user_id);
        
@@ -212,14 +216,6 @@ let editNoteByUses = async (req, res) => {
         console.log(req.user);
         if (updated) {
             sendEditRequestEmail(user.email, "Edited notes", `Note ${note.name} has been edited by ${req.user.email}.`)
-            // Nếu có ảnh mới và khác với ảnh cũ, xóa ảnh cũ
-            // if (note.img && noteCurrent.image) {
-            //     const imagePath = `src/public/uploads/${noteCurrent.image}`;
-            //     await unlinkFile(imagePath);
-
-            // }
-            // sendEditRequestEmail()
-
             res.redirect('/notes');
         }
 
