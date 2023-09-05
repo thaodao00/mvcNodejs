@@ -2,13 +2,19 @@
 const brypt = require('bcrypt');
 const serviceUser = require('../services/user.service');
 let getAllUser = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 2;
+
     try {
-        const users = await serviceUser.getAll();
+        const users = await serviceUser.getAll(page, pageSize);
+    
         res.render("index", {
             view_content: 'admin/dashboard',
-            users: users
+            users: users.users,
+            currentPage: users.currentPage,
+            totalPages: users.totalPages,
+            pageSize: pageSize
         });
-
     } catch (error) {
         console.error(error);
         res.status(500).send(error.message);

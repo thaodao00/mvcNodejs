@@ -8,16 +8,36 @@ const jobManager = require('../ultils/noteManager');
 const socketManager = require('../ultils/socketManager');
 const { sendEditRequestEmail } = require('../ultils/emailer');
 const serviceUser = require('./user.service');
-const { get } = require('jquery');
-let getAllNote = async () => {
-    return await models.Note.findAll({
-        order: [
-            ['created_at', 'DESC'] // Sắp xếp theo trường created_at từ mới đến cũ
-        ],
+const { Op } = require('sequelize');
+const encryption = require('../ultils/encryption');
+const QuillDeltaToHtmlConverter = require('quill-delta-to-html').QuillDeltaToHtmlConverter;
+
+
+//Lấy tất cả các note ở chế độ public
+let getAllNote = async (page, pageSize) => {
+    const offset = (page - 1) * pageSize;
+    const notes = await models.Note.findAll({
+        order: [['created_at', 'DESC']],
         where: {
             shared: 1
+        },
+        offset: offset,
+        limit: pageSize,
+
+
+    })
+    const totalCount = await models.Note.count({
+        where: {
+            shared: 1 // Thay userId bằng giá trị userID mà bạn muốn sử dụng
         }
     })
+    const totalPages = Math.ceil(totalCount / pageSize);
+    return {
+        notes: notes,
+        currentPage: page,
+        totalPages: totalPages
+    }
+
 }
 let sharedNote = async (noteId, body) => {
     return await models.Note.update({
@@ -63,9 +83,67 @@ let getNoteById = async (id) => {
         }
     })
 }
-//lấy tất cả post của user
 
-let getAllNoteByUser = async (userId) => {
+const searchNotes = async (userId, searchTerm, page, pageSize) => {
+    const notesFromDatabase = await getNotes(userId);
+    const offset = (page - 1) * pageSize;
+    const searchTermLower = searchTerm.toLowerCase(); 
+    const user = await serviceUser.getUserById(userId);
+    // Lấy danh sách ghi chú từ cơ sở dữ liệu
+    const { count: totalCount } = await models.Note.findAndCountAll({
+        where: {
+            user_id: userId
+        },
+        offset: offset,
+        limit: pageSize,
+        order: [['created_at', 'DESC']]
+    });
+
+    // Tìm kiếm trong nội dung văn bản
+    let matchingNotes = [];
+   
+    for (const encryptedNote of notesFromDatabase) {
+        const ex = encryption.decryptData(encryptedNote.description, user.secretKey);
+        const delta = JSON.parse(ex);
+        const delte = JSON.parse(delta);
+        const converter = new QuillDeltaToHtmlConverter(delte.ops, {});
+        const htmlContent = converter.convert();
+        if (htmlContent && htmlContent.toLowerCase().includes(searchTermLower)) {
+            matchingNotes.push(encryptedNote);
+        }
+    }
+    const endIndex = Math.min(offset + pageSize, matchingNotes.length);
+    const totalPages = Math.ceil(matchingNotes.length / pageSize);
+    matchingNotes = matchingNotes.slice(offset, endIndex);
+
+    return {
+        notes: matchingNotes,
+        currentPage: page,
+        totalPages: totalPages,
+        limit: pageSize
+    };
+};
+//lấy tất cả post của user
+let getAllNoteByUser = async (userId, page, pageSize) => {
+    const offset = (page - 1) * pageSize;
+    const notes = await models.Note.findAll({
+        order: [['created_at', 'DESC']],
+        where: { 'user_id': userId },
+        offset: offset,
+        limit: pageSize
+    })
+    const totalCount = await models.Note.count({
+        where: { 'user_id': userId },
+    })
+    const totalPages = Math.ceil(totalCount / pageSize);
+    return {
+        notes: notes,
+        currentPage: page,
+        totalPages: totalPages
+    }
+}
+
+let getNotes = async (userId) => {
     return await models.Note.findAll({
         where: {
             'user_id': userId
@@ -196,7 +274,7 @@ const createNote = async (body) => {
                 if (timeUntilNotification > 0) {
                     const notificationJob = schedule.scheduleJob(notificationDate, () => {
                         // io.emit('noteAboutToBeCancelled', `Note ${newNote.name} will be cancelled in 1 hour.`);
-                    sendEditRequestEmail(user.email, "Cancel notes after 1 hour!", `Note ${newNote.name} will cancel after 1 hour.`)
+                        sendEditRequestEmail(user.email, "Cancel notes after 1 hour!", `Note ${newNote.name} will cancel after 1 hour.`)
 
                     });
 
@@ -226,6 +304,7 @@ module.exports = {
     getAllNote: getAllNote,
     sharedNote: sharedNote,
     changeSharedNote: changeSharedNote,
-    editByUsers: editByUsers
-
+    editByUsers: editByUsers,
+    searchNotes: searchNotes,
+    getNotes: getNotes
 }

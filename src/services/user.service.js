@@ -3,7 +3,7 @@
 const models = require('../models');
 const bcrypt = require('bcrypt');
 
-//tìm kiếm tk theo email
+//tìm kiếm tk theo id
 let getUserById = async (id) => {
     return await models.User.findOne({
         where: {
@@ -35,10 +35,27 @@ let createUser = async (body) => {
     }
 }
 
-let getAll = async () => {
-    return await models.User.findAll({
-        order: [['created_at', 'DESC']]
+// let getAll = async () => {
+//     return await models.User.findAll({
+//         order: [['created_at', 'DESC']]
+//     });
+// }
+let getAll = async (page, pageSize)=> {
+    const offset = (page - 1) * pageSize;
+    const users = await models.User.findAll({
+        order: [['created_at', 'DESC']],
+        offset: offset,
+        limit: pageSize,
     });
+
+    const totalCount = await models.User.count();
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    return {
+        users: users,
+        currentPage: page,
+        totalPages: totalPages,
+    };
 }
 let updateRole = async (id, role) => {
     return await models.User.update({ role: role }, {
