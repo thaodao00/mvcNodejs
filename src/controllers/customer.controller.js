@@ -8,8 +8,10 @@ const serviceNote = require('./../services/note.service');
 const serviceUser = require('./../services/user.service');
 const { uploader, viewImage } = require('./../middlewares/upload');
 const { sendEditRequestEmail } = require('./../ultils/emailer');
-const Delta = require('quill-delta');
-const e = require('connect-flash');
+const socketManager = require('./../ultils/socketManager');
+const moment = require('moment');
+// const Delta = require('quill-delta');
+// const e = require('connect-flash');
 var loading = false
 // Get all notes by user
 let getAllNotes = async (req, res) => {
@@ -21,9 +23,9 @@ let getAllNotes = async (req, res) => {
     try {
         let listNote;
         if (searchTerm) {
-            listNote = await serviceNote.searchNotes(userId,searchTerm , page, pageSize);
-            
-            console.log("listNote___________________", listNote.currentPage, listNote.totalPages, pageSize,listNote.notes.length);
+            listNote = await serviceNote.searchNotes(userId, searchTerm, page, pageSize);
+
+            console.log("listNote___________________", listNote.currentPage, listNote.totalPages, pageSize, listNote.notes.length);
         } else {
             listNote = await serviceNote.getAllNoteByUser(userId, page, pageSize);
 
@@ -68,8 +70,22 @@ let createNote = async (req, res) => {
                 userId: userId,
                 cancel_at: cancel_at
             };
-            console.log("________________", newNote);
             const note = await serviceNote.createNote(newNote);
+            const ex = encryption.decryptData(note.description, req.user.secretKey);
+            const delta = JSON.parse(ex);
+            const converter = new QuillDeltaToHtmlConverter(JSON.parse(delta).ops, {});
+            const html = converter.convert();
+            note.description = html;
+            const date = moment(note.created_at).utcOffset(7).format('h:mm A, MMMM D, YYYY')
+            console.log(date,"____________________date");
+            note.created_at =date
+            console.log( note.created_at,"____________________date");
+            const imagePath = await viewImage(note.image);
+            note.image = imagePath;
+           
+
+            const io = socketManager.getSocketIOInstance();
+            io.emit('newNote', note);
             res.redirect('/home');
         }
         // res.send('success')
@@ -117,7 +133,6 @@ let deleteNote = async (req, res) => {
 
         let deleted = await serviceNote.deleteNote(noteId);
         const note = await serviceNote.getNoteById(noteId);
-        console.log("_________________note", note);
         // if (deleted) {
         // Nếu xóa ghi chú thành công, thực hiện xóa tập tin ảnh (nếu có)
         if (note && note.image) {
@@ -196,7 +211,6 @@ let shareNote = async (req, res) => {
     try {
         let noteId = req.params.id;
         const noteShared = await serviceNote.sharedNote(noteId, req.body);
-        // console.log("_________________note", noteShared);
         res.redirect('/home');
     } catch (e) {
         console.log(e);
@@ -242,7 +256,8 @@ let editNoteByUses = async (req, res) => {
         let updated = await serviceNote.editByUsers(noteId, note.descriptionNote);
         console.log(req.user);
         if (updated) {
-            sendEditRequestEmail(user.email, "Edited notes", `Note ${note.name} has been edited by ${req.user.email}.`)
+           await sendEditRequestEmail(user.email, "Edited notes", `Note ${note.name} has been edited by ${req.user.email}.`)
+            console.log(user.email, "______________________email");
             res.redirect('/notes');
         }
 
