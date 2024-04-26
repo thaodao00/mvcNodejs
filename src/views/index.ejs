@@ -11,42 +11,10 @@
       </main>
     </div>
     <%- include('./partials/scripts') %>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
       <script src="/socket.io/socket.io.js"></script>
-      </script>
-      <script>
-   
-        const socket = io();
-        socket.on('noteDeleted', (message) => {
-          // Hiển thị thông báo cho người dùng
-          // console.log('mess', message);
-          // displayErrorNotification(message)
-          Swal.fire({
-            title: 'Success!',
-            text: message,
-            icon: 'success',
-            showConfirmButton: true,
-            
-            // timer: 1500,
-          });
-          // alert(message);
-        });
-        socket.on('noteAboutToBeCancelled', (message) => {
-          // Hiển thị thông báo cho người dùng
-          // console.log('mess', message);
-          // displayErrorNotification(message)
-          Swal.fire({
-            title: 'Waring!',
-            text: message,
-            icon: 'Waring',
-            showConfirmButton: true,
-            
-            // timer: 1500,
-          });
-          // alert(message);
-        });
-        
-      </script>
+
+    
   </body>
 
 </html>
